@@ -1,7 +1,7 @@
-package taskservice;
+package clangame.taskservice;
 
-import clan.Clan;
-import clanservice.ClanService;
+import clangame.clan.Clan;
+import clangame.clanservice.ClanService;
 
 public class UserAddGoldService { // пользователь добавляет золото из собственного кармана
 
@@ -13,7 +13,7 @@ public class UserAddGoldService { // пользователь добавляет
 
     public void addGoldToClan(long userId, long clanId, int gold) {
         Clan clan = clans.get(clanId);
-        // clan.[gold] += gold;
+        // clangame.clan.[gold] += gold;
         // как-то сохранить изменения
     }
 }

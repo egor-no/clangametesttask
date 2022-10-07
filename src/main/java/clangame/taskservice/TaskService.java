@@ -1,7 +1,7 @@
-package taskservice;
+package clangame.taskservice;
 
-import clan.Clan;
-import clanservice.ClanService;
+import clangame.clan.Clan;
+import clangame.clanservice.ClanService;
 
 public class TaskService { // какой-то сервис с заданиями
 
@@ -11,13 +11,13 @@ public class TaskService { // какой-то сервис с заданиями
         this.clans = clans;
     }
 
-    void completeTask(long clanId, long taskId) {
+    public void completeTask(long clanId, long taskId) {
         // ...
 
         // if (success)
         {
             Clan clan = clans.get(clanId);
-            // clan.[gold] += gold;
+            // clangame.clan.[gold] += gold;
             // как-то сохранить изменения
         }
     }

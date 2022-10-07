@@ -1,8 +1,8 @@
-package clangame.clanservice;
+package clangame.services;
 
-import clangame.clan.Clan;
+import clangame.data.entities.Clan;
 
-public class ClanJBDCService implements ClanService {
+public class ClanServiceImpl implements ClanService {
     @Override
     public Clan get(long clanId) {
         return null;

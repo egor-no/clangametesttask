@@ -1,7 +1,7 @@
 package testThreads;
 
-import clangame.clanservice.ClanService;
-import clangame.taskservice.TaskService;
+import clangame.services.ClanService;
+import clangame.services.TaskService;
 
 import java.util.concurrent.CyclicBarrier;
 

@@ -1,6 +1,6 @@
-package clangame.clanservice;
+package clangame.services;
 
-import clangame.clan.Clan;
+import clangame.data.entities.Clan;
 
 // Есть сервис, посвященный кланам.
 // Да это выглядит как 'репозиторий'.

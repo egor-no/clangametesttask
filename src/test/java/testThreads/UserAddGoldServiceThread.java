@@ -1,7 +1,7 @@
 package testThreads;
 
-import clangame.clanservice.ClanService;
-import clangame.taskservice.UserAddGoldService;
+import clangame.services.ClanService;
+import clangame.services.UserAddGoldService;
 
 import java.util.concurrent.CyclicBarrier;
 

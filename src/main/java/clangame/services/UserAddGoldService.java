@@ -1,7 +1,7 @@
-package clangame.taskservice;
+package clangame.services;
 
-import clangame.clan.Clan;
-import clangame.clanservice.ClanService;
+import clangame.data.entities.Clan;
+import clangame.services.ClanService;
 
 public class UserAddGoldService { // пользователь добавляет золото из собственного кармана
 
@@ -15,5 +15,8 @@ public class UserAddGoldService { // пользователь добавляет
         Clan clan = clans.get(clanId);
         // clangame.clan.[gold] += gold;
         // как-то сохранить изменения
+
+        //transactiondao
+        //usertransaction dao
     }
 }

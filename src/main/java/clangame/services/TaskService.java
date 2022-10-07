@@ -1,7 +1,7 @@
-package clangame.taskservice;
+package clangame.services;
 
-import clangame.clan.Clan;
-import clangame.clanservice.ClanService;
+import clangame.data.entities.Clan;
+import clangame.services.ClanService;
 
 public class TaskService { // какой-то сервис с заданиями
 

@@ -1,8 +1,7 @@
-import clangame.clan.Clan;
-import clangame.clanservice.ClanJBDCService;
-import clangame.clanservice.ClanService;
-import clangame.taskservice.TaskService;
-import clangame.taskservice.UserAddGoldService;
+import clangame.services.ClanService;
+import clangame.services.ClanServiceImpl;
+import clangame.services.TaskService;
+import clangame.services.UserAddGoldService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import testThreads.TaskServiceThread;
@@ -20,7 +19,7 @@ public class ClanGoldTest {
     @Test
     @DisplayName("TaskService changes gold")
     public void testOneTaskService() {
-        ClanService clanService = new ClanJBDCService();
+        ClanService clanService = new ClanServiceImpl();
         TaskService taskService = new TaskService(clanService);
         taskService.completeTask(1, 1);
 
@@ -30,7 +29,7 @@ public class ClanGoldTest {
     @Test
     @DisplayName("UserAddService changes gold")
     public void testOneUserAddGoldService() {
-        ClanService clanService = new ClanJBDCService();
+        ClanService clanService = new ClanServiceImpl();
         UserAddGoldService userAddGoldService = new UserAddGoldService(clanService);
         userAddGoldService.addGoldToClan(1,1, 100);;
 
@@ -40,7 +39,7 @@ public class ClanGoldTest {
     @Test
     @DisplayName("100 TaskServices change gold")
     public void testHundredTaskServices() {
-        ClanService clanService = new ClanJBDCService();
+        ClanService clanService = new ClanServiceImpl();
         final CyclicBarrier gate = new CyclicBarrier(100);
 
         for (int i = 0 ; i < 100; i++) {
@@ -61,7 +60,7 @@ public class ClanGoldTest {
     @Test
     @DisplayName("100 UserAddServices change gold")
     public void testHundredUserAddGoldServices() {
-        ClanService clanService = new ClanJBDCService();
+        ClanService clanService = new ClanServiceImpl();
         final CyclicBarrier gate = new CyclicBarrier(100);
 
         for (int i = 0 ; i < 100; i++) {
@@ -81,7 +80,7 @@ public class ClanGoldTest {
     @Test
     @DisplayName("100 Random Services change gold")
     public void testHundredRandomServices() {
-        ClanService clanService = new ClanJBDCService();
+        ClanService clanService = new ClanServiceImpl();
         final CyclicBarrier gate = new CyclicBarrier(100);
 
         for (int i = 0 ; i < 100; i++) {

@@ -1,7 +1,7 @@
-import clangame.services.ClanService;
-import clangame.services.ClanServiceImpl;
-import clangame.services.TaskService;
-import clangame.services.UserAddGoldService;
+import com.clangame.demo.services.ClanService;
+import com.clangame.demo.services.ClanServiceImpl;
+import com.clangame.demo.services.TaskService;
+import com.clangame.demo.services.UserAddGoldService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import testThreads.TaskServiceThread;

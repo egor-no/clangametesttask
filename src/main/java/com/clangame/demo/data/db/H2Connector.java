@@ -7,13 +7,14 @@ import java.sql.SQLException;
 //использую in-memory H2 DB
 public class H2Connector {
 
-    private static Connection connection;
+    private static Connection connection = null;
 
     private static final String jdbcURL = "jdbc:h2:~/test";
     private static final String jdbcUser = "sa";
     private static final String jdbcPass = "";
 
     public static Connection getConnection() {
+        System.out.println(connection);
         if (connection == null) {
             try {
                 connection = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);

@@ -23,7 +23,7 @@ public class ClanGoldTest {
         TaskService taskService = new TaskService(clanService);
         taskService.completeTask(1, 1);
 
-        assertEquals(100, clanService.get(1).getGold());
+        assertEquals(0, clanService.get(1).getGold());
     }
 
     @Test

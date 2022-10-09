@@ -2,6 +2,7 @@ package com.clangame.demo.data.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class H2dataInitializer {
@@ -17,25 +18,45 @@ public class H2dataInitializer {
         fillClanTable();
         fillTaskTable();
         fillUserTable();
+
+        try {
+            printDB();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
+    private static void printDB() throws SQLException {
+        String sql = "SELECT * FROM clan";
+
+        PreparedStatement ps = H2Connector.getConnection().prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            System.out.println(rs.getLong("clan_id"));
+            System.out.println(rs.getString("name"));
+        }
     }
 
     private static void createSchema() {
-        PreparedStatement createPreparedStatement = null;
-        String createQuery = "CREATE TABLE clan (\n" +
+        String clearQuery = "DROP ALL OBJECTS";
+        executeCreateStatement(clearQuery);
+
+        String createQuery = "CREATE TABLE IF NOT EXISTS clan (\n" +
                 "    clan_id BIGINT AUTO_INCREMENT PRIMARY KEY,\n" +
                 "    name VARCHAR(36) NOT NULL,\n" +
                 "    gold INTEGER\n" +
                 ")";
         executeCreateStatement(createQuery);
 
-        createQuery = "CREATE TABLE task(\n" +
+        createQuery = "CREATE TABLE IF NOT EXISTS task (\n" +
                 "     task_id BIGINT AUTO_INCREMENT PRIMARY KEY,\n" +
                 "     description VARCHAR(100) NOT NULL,\n" +
                 "     gold_given INT\n" +
                 ")";
         executeCreateStatement(createQuery);
 
-        createQuery = "CREATE TABLE user(\n" +
+        createQuery = "CREATE TABLE IF NOT EXISTS  users (\n" +
                 "     user_id BIGINT AUTO_INCREMENT PRIMARY KEY,\n" +
                 "     name VARCHAR(16) NOT NULL,\n" +
                 "     surname VARCHAR(16) NOT NULL,\n" +
@@ -43,7 +64,7 @@ public class H2dataInitializer {
                 ")";
         executeCreateStatement(createQuery);
 
-        createQuery = "CREATE TABLE transaction(\n" +
+        createQuery = "CREATE TABLE IF NOT EXISTS  transaction(\n" +
                 "     transaction_id BIGINT AUTO_INCREMENT PRIMARY KEY,\n" +
                 "     clan_id BIGINT NOT NULL,\n" +
                 "     delta INT NOT NULL,\n" +
@@ -52,22 +73,25 @@ public class H2dataInitializer {
                 ")";
         executeCreateStatement(createQuery);
 
-        createQuery = "CREATE TABLE user_transaction(\n" +
-                "    transaction_id BIGINT PRIMARY KEY,\n" +
-                "    user_id BIGINT PRIMARY KEY\n" +
+
+        createQuery = "CREATE TABLE IF NOT EXISTS  user_transaction(\n" +
+                "    transaction_id BIGINT,\n" +
+                "    user_id BIGINT,\n" +
+                "    PRIMARY KEY(transaction_id, user_id)\n" +
                 ")";
         executeCreateStatement(createQuery);
 
-        createQuery = "CREATE TABLE task_transaction(\n" +
-                "     transaction_id BIGINT PRIMARY KEY,\n" +
-                "     task_id BIGINT PRIMARY KEY\n" +
+        createQuery = "CREATE TABLE IF NOT EXISTS task_transaction(\n" +
+                "     transaction_id BIGINT,\n" +
+                "     task_id BIGINT,\n" +
+                "     PRIMARY KEY(transaction_id, task_id)\n" +
                 ")";
         executeCreateStatement(createQuery);
 
-        String alterQuery = "ALTER TABLE user ADD FOREIGN KEY (clan_id) REFERENCES clan(clan_id);\n" +
+        String alterQuery = "ALTER TABLE users ADD FOREIGN KEY (clan_id) REFERENCES clan(clan_id);\n" +
                 "ALTER TABLE transaction ADD FOREIGN KEY (clan_id) REFERENCES clan(clan_id);\n" +
                 "ALTER TABLE user_transaction ADD FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id);\n" +
-                "ALTER TABLE user_transaction ADD FOREIGN KEY (user_id) REFERENCES user(user_id);\n" +
+                "ALTER TABLE user_transaction ADD FOREIGN KEY (user_id) REFERENCES users(user_id);\n" +
                 "ALTER TABLE task_transaction ADD FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id);\n" +
                 "ALTER TABLE task_transaction ADD FOREIGN KEY (task_id) REFERENCES task(task_id);";
         executeCreateStatement(alterQuery);
@@ -85,7 +109,7 @@ public class H2dataInitializer {
     }
 
     private static void fillClanTable() {
-        String insertQuery = "INSERT INTO clan" + "(name, gold) VALUES" + "(?,?)";
+        String insertQuery = "INSERT INTO clan " + "(name, gold) VALUES " + "(?,?)";
 
         insertIntoClanTable(insertQuery, "Elfs", 0);
         insertIntoClanTable(insertQuery, "Humans", 0);
@@ -98,6 +122,8 @@ public class H2dataInitializer {
             PreparedStatement insertPreparedStatement = connection.prepareStatement(query);
             insertPreparedStatement.setString(1, name);
             insertPreparedStatement.setInt(2, gold);
+            insertPreparedStatement.executeUpdate();
+            insertPreparedStatement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -105,7 +131,7 @@ public class H2dataInitializer {
 
     private static void fillTaskTable() {
         String insertQuery = "INSERT INTO task"
-                + " (description, gold_given) VALUES" + "(?,?)";
+                + " (description, gold_given) VALUES " + "(?,?)";
 
         insertIntoClanTable(insertQuery, "You dont have to do anything, just take the money", 100);
     }
@@ -115,14 +141,16 @@ public class H2dataInitializer {
             PreparedStatement insertPreparedStatement = connection.prepareStatement(query);
             insertPreparedStatement.setString(1, description);
             insertPreparedStatement.setInt(2, goldGiven);
+            insertPreparedStatement.executeUpdate();
+            insertPreparedStatement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
 
     private static void fillUserTable() {
-        String insertQuery = "INSERT INTO user"
-                + "(name, surname, clan_id) VALUES" + "(?,?,?)";
+        String insertQuery = "INSERT INTO users "
+                + "(name, surname, clan_id) VALUES " + "(?,?,?)";
 
         insertIntoUserTable(insertQuery, "John", "Doe", 1L);
         insertIntoUserTable(insertQuery, "Jane", "Doe", 1L);
@@ -139,8 +167,11 @@ public class H2dataInitializer {
             insertPreparedStatement.setString(1, name);
             insertPreparedStatement.setString(2, surname);
             insertPreparedStatement.setLong(3, clanId);
+            insertPreparedStatement.executeUpdate();
+            insertPreparedStatement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
+
 }

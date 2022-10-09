@@ -19,7 +19,7 @@ public class UserAddGoldServiceThread extends Thread  {
 
     @Override
     public void run() {
-        UserAddGoldService userAddGoldService = new UserAddGoldService(clanService);
-        userAddGoldService.addGoldToClan(1,1, 100);
+        //UserAddGoldService userAddGoldService = new UserAddGoldService(clanService);
+        //userAddGoldService.addGoldToClan(1,1, 100);
     }
 }

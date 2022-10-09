@@ -10,11 +10,13 @@ import javax.inject.Inject;
 public class ClanServiceImpl implements ClanService {
 
     @Inject
-    ClanDAO clanDAO;
+    private ClanDAO clanDAO;
 
     @Override
     public Clan get(long clanId) {
-        return clanDAO.get(clanId).orElse(null);
+        Clan orElse = new Clan(clanId, "test", 100);
+        System.out.println((clanDAO == null) + "  ATTETNTION!!!!");
+        return clanDAO.get(clanId).orElse(orElse);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.clangame.demo.data.db.H2Connector;
 import com.clangame.demo.data.entities.Clan;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,22 +15,26 @@ import java.util.Optional;
 @ApplicationScoped
 public class ClanDAO implements DAO<Clan> {
 
+    @Inject
+    private H2Connector connector;
+
     @Override
     public Optional<Clan> get(long id) {
-        String sql = "SELECT clan_id, name, gold FROM clan WHERE id=?";
-
-        Clan clan = null;
-        try (Connection connection = H2Connector.getConnection()){
+        String sql = "SELECT * FROM clan WHERE clan_id=?";
+        System.out.println("here");
+        Clan clan = new Clan(0, "test", 100);
+        try (Connection connection = connector.getConnection()){
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
 
-            clan = new Clan();
             while (rs.next()) {
                 clan.setId(rs.getLong("clan_id"));
                 clan.setName(rs.getString("name"));
                 clan.setGold(rs.getInt("gold"));
             }
+
+            System.out.println(clan.getGold()+" "+clan.getId()+ " "+ clan.getName());
 
         } catch (SQLException ex) {
             ex.printStackTrace();

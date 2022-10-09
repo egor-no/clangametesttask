@@ -29,7 +29,7 @@ public class H2dataInitializer {
     private static void printDB() throws SQLException {
         String sql = "SELECT * FROM clan";
 
-        PreparedStatement ps = H2Connector.getConnection().prepareStatement(sql);
+        PreparedStatement ps = connection.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
 
         while (rs.next()) {

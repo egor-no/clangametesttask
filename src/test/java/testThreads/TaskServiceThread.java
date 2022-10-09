@@ -20,7 +20,7 @@ public class TaskServiceThread extends Thread {
 
     @Override
     public void run() {
-        TaskService taskService = new TaskService(clanService);
-        taskService.completeTask(1, 1);
+        //TaskService taskService = new TaskService(clanService);
+        //taskService.completeTask(1, 1);
     }
 }

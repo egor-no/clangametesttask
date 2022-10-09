@@ -1,9 +1,4 @@
 import com.clangame.demo.data.db.H2Connector;
-import com.clangame.demo.data.db.H2dataInitializer;
-import com.clangame.demo.data.entities.Clan;
-import com.clangame.demo.services.ClanService;
-import com.clangame.demo.services.ClanServiceImpl;
-import com.clangame.demo.services.TaskService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -17,8 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 //Тесты, чтобы следить, что связь с базой данных поддерживается
 //Проверяю чтение Клана и его сохранение
-
 public class DBTest {
+
+    private static H2Connector сonnector = new H2Connector();
 
     @Test
     @DisplayName("Create table in DB")
@@ -29,7 +25,7 @@ public class DBTest {
                 "     name VARCHAR(100) NOT NULL\n" +
                 ")";
 
-        PreparedStatement statement = H2Connector.getConnection().prepareStatement(testQuery);
+        PreparedStatement statement = сonnector.getConnection().prepareStatement(testQuery);
         statement.executeUpdate();
         statement.close();
     }
@@ -41,7 +37,7 @@ public class DBTest {
         String insertQuery = "INSERT INTO test"
                 + " (name) VALUES" + " (?)";
 
-        PreparedStatement insertPreparedStatement = H2Connector.getConnection()
+        PreparedStatement insertPreparedStatement = сonnector.getConnection()
                 .prepareStatement(insertQuery);
         insertPreparedStatement.setString(1, "hello from JUnit");
 
@@ -55,13 +51,29 @@ public class DBTest {
     public void testReadDB() throws SQLException {
         String sql = "SELECT * FROM test WHERE test_id=?";
 
-        PreparedStatement ps = H2Connector.getConnection().prepareStatement(sql);
+        PreparedStatement ps = сonnector.getConnection().prepareStatement(sql);
         ps.setLong(1, 1);
         ResultSet rs = ps.executeQuery();
 
         while (rs.next()) {
             assertEquals(1, rs.getLong("test_id"));
             assertEquals("hello from JUnit", rs.getString("name"));
+        }
+    }
+
+    @Test
+    @DisplayName("Read data from DB")
+    @Order(4)
+    public void testReadActualDB() throws SQLException {
+        String sql = "SELECT * FROM clan WHERE clan_id=?";
+
+        PreparedStatement ps = сonnector.getConnection().prepareStatement(sql);
+        ps.setLong(1, 1);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            assertEquals(1, rs.getLong("clan_id"));
+            assertEquals("Elfs", rs.getString("name"));
         }
     }
 }

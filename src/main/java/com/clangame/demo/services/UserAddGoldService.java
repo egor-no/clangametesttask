@@ -2,13 +2,14 @@ package com.clangame.demo.services;
 
 import com.clangame.demo.data.entities.Clan;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+@ApplicationScoped
 public class UserAddGoldService { // пользователь добавляет золото из собственного кармана
 
-    private final ClanService clans;
-
-    public UserAddGoldService(ClanService clans) {
-        this.clans = clans;
-    }
+    @Inject
+    private ClanService clans;
 
     public void addGoldToClan(long userId, long clanId, int gold) {
         Clan clan = clans.get(clanId);

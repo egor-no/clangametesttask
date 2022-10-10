@@ -51,14 +51,16 @@ public class DBTest {
     public void testReadDB() throws SQLException {
         String sql = "SELECT * FROM test WHERE test_id=?";
 
-        PreparedStatement ps = сonnector.getConnection().prepareStatement(sql);
-        ps.setLong(1, 1);
-        ResultSet rs = ps.executeQuery();
+        PreparedStatement statement = сonnector.getConnection().prepareStatement(sql);
+        statement.setLong(1, 1);
+        ResultSet rs = statement.executeQuery();
 
         while (rs.next()) {
             assertEquals(1, rs.getLong("test_id"));
             assertEquals("hello from JUnit", rs.getString("name"));
         }
+
+        statement.close();
     }
 
     @Test
@@ -67,13 +69,15 @@ public class DBTest {
     public void testReadActualDB() throws SQLException {
         String sql = "SELECT * FROM clan WHERE clan_id=?";
 
-        PreparedStatement ps = сonnector.getConnection().prepareStatement(sql);
-        ps.setLong(1, 1);
-        ResultSet rs = ps.executeQuery();
+        PreparedStatement statement = сonnector.getConnection().prepareStatement(sql);
+        statement.setLong(1, 1);
+        ResultSet rs = statement.executeQuery();
 
         while (rs.next()) {
             assertEquals(1, rs.getLong("clan_id"));
             assertEquals("Elfs", rs.getString("name"));
         }
+
+        statement.close();
     }
 }

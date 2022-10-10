@@ -21,7 +21,7 @@ CREATE TABLE transaction(
      transaction_id BIGINT AUTO_INCREMENT PRIMARY KEY,
      clan_id BIGINT NOT NULL,
      delta INT NOT NULL,
-     source INT,
+     source VARCHAR(6),
      is_successful BOOLEAN
 );
 

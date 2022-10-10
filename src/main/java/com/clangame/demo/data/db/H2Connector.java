@@ -10,7 +10,7 @@ import java.sql.SQLException;
 @ApplicationScoped
 public class H2Connector {
 
-    private Connection connection = null;
+    private boolean initIsNeeded = true;
 
     private final String jdbcURL = "jdbc:h2:~/test";
     private final String jdbcUser = "sa";
@@ -19,14 +19,13 @@ public class H2Connector {
     @SneakyThrows
     public Connection getConnection() {
         Class.forName("org.h2.Driver");
-        if (connection == null) {
-            try {
-                connection = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
-                H2dataInitializer.fillTheDB(connection);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        Connection connection = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
+
+        if (initIsNeeded) {
+            H2dataInitializer.fillTheDB(connection);
+            initIsNeeded = false;
         }
+
         return connection;
     }
 

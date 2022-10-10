@@ -1,14 +1,12 @@
 package com.clangame.demo.data.entities;
 
 import com.clangame.demo.data.tools.GoldSource;
+import lombok.Data;
 
+@Data
 public class TaskTransaction {
 
-    private Transaction goldTransaction;
+    private Transaction transaction;
     private long taskId;
 
-    public TaskTransaction() {
-        goldTransaction = new Transaction();
-        goldTransaction.setSource(GoldSource.USER_ADD);
-    }
 }

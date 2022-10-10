@@ -21,9 +21,11 @@ public class H2dataInitializer {
 
         try {
             printDB();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            connection.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
+
     }
 
     private static void printDB() throws SQLException {
@@ -68,7 +70,7 @@ public class H2dataInitializer {
                 "     transaction_id BIGINT AUTO_INCREMENT PRIMARY KEY,\n" +
                 "     clan_id BIGINT NOT NULL,\n" +
                 "     delta INT NOT NULL,\n" +
-                "     source INT,\n" +
+                "     source VARCHAR(8),\n" +
                 "     is_successful BOOLEAN\n" +
                 ")";
         executeCreateStatement(createQuery);

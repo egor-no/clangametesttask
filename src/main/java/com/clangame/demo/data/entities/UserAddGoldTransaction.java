@@ -6,11 +6,7 @@ import lombok.Data;
 @Data
 public class UserAddGoldTransaction {
 
-    private Transaction goldTransaction;
+    private Transaction transaction;
     private long userId;
 
-    public UserAddGoldTransaction() {
-        goldTransaction = new Transaction();
-        goldTransaction.setSource(GoldSource.USER_ADD);
-    }
 }

@@ -23,7 +23,7 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction> {
     }
 
     @Override
-    public void update(UserAddGoldTransaction userAddGoldTransaction, String[] params) {
+    public void update(UserAddGoldTransaction userAddGoldTransaction) {
 
     }
 

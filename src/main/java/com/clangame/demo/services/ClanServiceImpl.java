@@ -5,6 +5,7 @@ import com.clangame.demo.data.entities.Clan;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.List;
 
 @ApplicationScoped
 public class ClanServiceImpl implements ClanService {
@@ -14,13 +15,26 @@ public class ClanServiceImpl implements ClanService {
 
     @Override
     public Clan get(long clanId) {
-        Clan orElse = new Clan(clanId, "test", 100);
-        System.out.println((clanDAO == null) + "  ATTETNTION!!!!");
-        return clanDAO.get(clanId).orElse(orElse);
+        return clanDAO.get(clanId).orElse(null);
+    }
+
+    @Override
+    public List<Clan> getAll() {
+        return clanDAO.getAll();
     }
 
     @Override
     public void save(Clan clan) {
+        clanDAO.save(clan);
+    }
 
+    public void update(Clan clan) {
+        clanDAO.update(clan);
+    }
+
+
+
+    public void delete(Clan clan) {
+        clanDAO.delete(clan);
     }
 }

@@ -86,7 +86,7 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction> {
 
     @Override
     public void delete(UserAddGoldTransaction userTransaction) {
-        String sql = "DELETE FROM user_transaction" +
+        String sql = "DELETE FROM user_transaction " +
                 "WHERE transaction_id=?";
         try (Connection connection = connector.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);

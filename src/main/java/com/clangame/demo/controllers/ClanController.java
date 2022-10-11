@@ -10,17 +10,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 @Path("/clan")
 public class ClanController {
     @Inject
     ClanService clanService;
-
-    @GET
-    @Produces("text/plain")
-    public String hello() {
-        return "Hello, World!";
-    }
 
     @GET
     @Path("/{id}")
@@ -31,4 +26,12 @@ public class ClanController {
             return Response.ok(clan).build();
         return Response.status(Response.Status.NOT_FOUND).build();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAll() {
+        List<Clan> clans = clanService.getAll();
+        return Response.ok(clans).build();
+    }
+
 }

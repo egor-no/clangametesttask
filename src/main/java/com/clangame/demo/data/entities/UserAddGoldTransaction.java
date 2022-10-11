@@ -9,4 +9,7 @@ public class UserAddGoldTransaction {
     private Transaction transaction;
     private long userId;
 
+    public long getTransactionId() {
+        return transaction.getId();
+    }
 }

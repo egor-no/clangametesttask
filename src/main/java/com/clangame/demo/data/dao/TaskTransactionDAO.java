@@ -24,7 +24,7 @@ public class TaskTransactionDAO implements DAO<TaskTransaction> {
     public Optional<TaskTransaction> get(long id) {
         String sql = "SELECT t.transaction_id, t.clan_id, t.delta, t.source, t.is_successful, tt.task_id \n" +
                 "FROM task_transaction tt LEFT JOIN transaction t ON tt.transaction_id = t.transaction_id \n" +
-                "WHERE id=?";
+                "WHERE transaction_id=?";
         TaskTransaction taskTransaction = null;
         try (Connection connection = connector.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -49,6 +49,7 @@ public class TaskTransactionDAO implements DAO<TaskTransaction> {
             ResultSet rs = statement.executeQuery(sql);
             while (rs.next()) {
                 TaskTransaction taskTransaction = extractTransaction(rs);
+                transactions.add(taskTransaction);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -71,7 +72,7 @@ public class TaskTransactionDAO implements DAO<TaskTransaction> {
         try (Connection connection = connector.getConnection()) {
             transactionDAO.save(taskTransaction.getTransaction());
             PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);
-            insertPreparedStatement.setLong(1, taskTransaction.getTransaction().getId());
+            insertPreparedStatement.setLong(1, taskTransaction.getTransactionId());
             insertPreparedStatement.setLong(2, taskTransaction.getTaskId());
             insertPreparedStatement.executeUpdate();
         } catch (SQLException ex) {
@@ -89,7 +90,14 @@ public class TaskTransactionDAO implements DAO<TaskTransaction> {
 
     @Override
     public void delete(TaskTransaction taskTransaction) {
-        //нельзя ничего обновить в таблице taskTransaction
-        // - все колонки таблицы - внешние ключи
+        String sql = "DELETE FROM task_transaction" +
+                "WHERE transaction_id=?";
+        try (Connection connection = connector.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setLong(1, taskTransaction.getTransactionId());
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 }

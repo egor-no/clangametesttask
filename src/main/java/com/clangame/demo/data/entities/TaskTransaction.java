@@ -9,4 +9,8 @@ public class TaskTransaction {
     private Transaction transaction;
     private long taskId;
 
+    public long getTransactionId() {
+        return transaction.getId();
+    }
+
 }

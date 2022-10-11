@@ -24,17 +24,17 @@ public class ClanServiceImpl implements ClanService {
     }
 
     @Override
-    public void save(Clan clan) {
+    public long save(Clan clan) {
         clanDAO.save(clan);
+        long id = clanDAO.getAll().size();
+        return id;
     }
 
     public void update(Clan clan) {
         clanDAO.update(clan);
     }
 
-
-
-    public void delete(Clan clan) {
-        clanDAO.delete(clan);
+    public void delete(long clanId) {
+        clanDAO.delete(clanId);
     }
 }

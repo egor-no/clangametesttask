@@ -12,13 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class TransactionDAO implements DAO<Transaction> {
+public class TransactionDAO implements DAO<Transaction, Long> {
 
     @Inject
     H2Connector connector;
 
     @Override
-    public Optional<Transaction> get(long id) {
+    public Optional<Transaction> get(Long id) {
         String sql = "SELECT * FROM transaction WHERE transaction_id=?";
         Transaction transaction = null;
         try (Connection connection = connector.getConnection()) {
@@ -41,6 +41,22 @@ public class TransactionDAO implements DAO<Transaction> {
         try (Connection connection = connector.getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
+            while (rs.next()) {
+                transactions.add(extractTransaction(rs));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return transactions;
+    }
+
+    public List<Transaction> getAllByClanId(long clanId) {
+        String sql = "SELECT * FROM transaction WHERE clan_id=?";
+        List<Transaction> transactions = new ArrayList<>();
+        try (Connection connection = connector.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setLong(1, clanId);
+            ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 transactions.add(extractTransaction(rs));
             }
@@ -79,8 +95,8 @@ public class TransactionDAO implements DAO<Transaction> {
     @Override
     public void update(Transaction transaction) {
         String updateQuery = "UPDATE transaction " +
-                "SET (clan_id, delta, source, is_successful) VALUES " +
-                "(?,?,?,?) WHERE transaction_id=?";
+                "SET clan_id=?, delta=?, source=?, is_successful=? " +
+                "WHERE transaction_id=?";
         try (Connection connection = connector.getConnection()) {
             PreparedStatement insertPreparedStatement = connection.prepareStatement(updateQuery);
             insertPreparedStatement.setLong(1, transaction.getClanId());
@@ -95,11 +111,11 @@ public class TransactionDAO implements DAO<Transaction> {
     }
 
     @Override
-    public void delete(Transaction transaction) {
+    public void delete(Long id) {
         String sql = "DELETE FROM transaction WHERE transaction_id=?";
         try (Connection connection = connector.getConnection()){
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, transaction.getId());
+            ps.setLong(1, id);
             ps.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();

@@ -11,17 +11,19 @@ import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
-public class ClanDAO implements DAO<Clan> {
+public class ClanDAO implements DAO<Clan, Long> {
 
     @Inject
     private H2Connector connector;
 
     @Override
-    public Optional<Clan> get(long id) {
+    public Optional<Clan> get(Long id) {
         String sql = "SELECT * FROM clan WHERE clan_id=?";
+
         Clan clan = null;
         try (Connection connection = connector.getConnection()){
-            PreparedStatement ps = connection.prepareStatement(sql);
+            System.out.println(connection.isClosed() + " ");
+            PreparedStatement ps = connector.getConnection().prepareStatement(sql);
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -41,7 +43,7 @@ public class ClanDAO implements DAO<Clan> {
     public List<Clan> getAll() {
         String sql = "SELECT * FROM clan";
         List<Clan> clans = new ArrayList<>();
-        try (Connection connection = connector.getConnection()){
+        try (Connection connection = connector.getConnection()){ ;
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
             while (rs.next()) {
@@ -73,12 +75,13 @@ public class ClanDAO implements DAO<Clan> {
 
     @Override
     public void update(Clan clan) {
-        String updateQuery = "UPDATE clan " + "SET (name, gold) VALUES "
-                + "(?,?) WHERE clan_id=?";
+        String updateQuery = "UPDATE clan SET name=?, gold=? "
+                + "WHERE clan_id=?";
         try (Connection connection = connector.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(updateQuery);
             statement.setString(1, clan.getName());
             statement.setInt(2, clan.getGold());
+            System.out.println("!!!!!!!!!!!!!!!!! " + clan.getGold() + " !!!!!!!!!!");
             statement.setLong(3, clan.getId());
             statement.executeUpdate();
         } catch (SQLException ex) {
@@ -87,11 +90,11 @@ public class ClanDAO implements DAO<Clan> {
     }
 
     @Override
-    public void delete(Clan clan) {
+    public void delete(Long id) {
         String sql = "DELETE FROM clan WHERE clan_id=?";
         try (Connection connection = connector.getConnection()){
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, clan.getId());
+            ps.setLong(1, id);
             ps.executeUpdate();
 
         } catch (SQLException ex) {

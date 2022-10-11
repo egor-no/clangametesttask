@@ -5,6 +5,7 @@ import com.clangame.demo.data.entities.User;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.List;
 
 @ApplicationScoped
 public class UserService {
@@ -16,16 +17,22 @@ public class UserService {
         return userDAO.get(userId).orElse(null);
     }
 
-    public void save(User user) {
+    public List<User> getAll() {
+        return userDAO.getAll();
+    }
+
+    public long save(User user) {
         userDAO.save(user);
+        long id = getAll().size();
+        return id;
     }
 
     public void update(User user) {
         userDAO.update(user);
     }
 
-    public void delete(User user) {
-        userDAO.delete(user);
+    public void delete(long userId) {
+        userDAO.delete(userId);
     }
 
 }

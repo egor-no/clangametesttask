@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class TaskDAO implements DAO<Task> {
+public class TaskDAO implements DAO<Task, Long> {
 
     @Inject
     H2Connector connector;
 
     @Override
-    public Optional<Task> get(long id) {
+    public Optional<Task> get(Long id) {
         String sql = "SELECT * FROM task WHERE task_id=?";
         Task task = null;
         try (Connection connection = connector.getConnection()) {
@@ -41,7 +41,7 @@ public class TaskDAO implements DAO<Task> {
         String sql = "SELECT * FROM task";
         List<Task> tasks = new ArrayList<>();
         try (Connection connection = connector.getConnection()) {
-            Statement stmt = connection.prepareStatement(sql);
+            Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 Task task = new Task();
@@ -72,7 +72,7 @@ public class TaskDAO implements DAO<Task> {
 
     @Override
     public void update(Task task) {
-        String updateQuery = "INSERT INTO task (description, gold_given) VALUES (?,?)"
+        String updateQuery = "UPDATE task SET description=?, gold_given=?"
                 + " WHERE task_id=?";
         try (Connection connection = connector.getConnection()) {
             PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
@@ -86,11 +86,11 @@ public class TaskDAO implements DAO<Task> {
     }
 
     @Override
-    public void delete(Task task) {
+    public void delete(Long id) {
         String sql = "DELETE FROM task WHERE task_id=?";
         try (Connection connection = connector.getConnection()) {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, task.getId());
+            ps.setLong(1, id);
             ps.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();

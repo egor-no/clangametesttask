@@ -10,6 +10,7 @@ import com.clangame.demo.data.tools.GoldSource;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Random;
 
 @ApplicationScoped
@@ -28,24 +29,23 @@ public class TaskService { // какой-то сервис с заданиями
         return taskDAO.get(taskId).orElse(null);
     }
 
-    public void save(Task task) {
+    public List<Task> getAll() {
+        return taskDAO.getAll();
+    }
+
+    public long save(Task task) {
         taskDAO.save(task);
+        long id = taskDAO.getAll().size();
+        return id;
     }
 
     public void update(Task task) {
         taskDAO.update(task);
     }
 
-    public void completeTask(long clanId, long taskId) {
+    public TaskTransaction completeTask(long clanId, long taskId) {
         boolean isAttemptSuccessful = isTaskComplete(clanId, taskId);
         int delta = taskDAO.get(taskId).get().getGoldGiven();
-
-        if (isAttemptSuccessful) {
-             Clan clan = clanService.get(clanId);
-             int newBalance = clan.getGold() + delta;
-             clan.setGold(newBalance);
-             clanService.save(clan);
-        }
 
         Transaction transaction = new Transaction();
         transaction.setSuccessful(isAttemptSuccessful);
@@ -56,6 +56,15 @@ public class TaskService { // какой-то сервис с заданиями
         taskTransaction.setTransaction(transaction);
         taskTransaction.setTaskId(taskId);
         transactionDAO.save(taskTransaction);
+        if (isAttemptSuccessful) {
+            Clan clan = clanService.get(clanId);
+            int newBalance = clan.getGold() + delta;
+            clan.setGold(newBalance);
+            clanService.update(clan);
+            return taskTransaction;
+        } else
+            return null;
+
     }
 
     private boolean isTaskComplete(long clanId, long taskId) {
@@ -67,8 +76,8 @@ public class TaskService { // какой-то сервис с заданиями
         return false;
     }
 
-    public void delete(Task task) {
-        taskDAO.delete(task);
+    public void delete(long taskId) {
+        taskDAO.delete(taskId);
     }
 
 }

@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UserDAO implements DAO<User> {
+public class UserDAO implements DAO<User, Long> {
 
     @Inject
     H2Connector connector;
 
     @Override
-    public Optional<User> get(long id) {
-        String sql = "SELECT * FROM users WHERE user_is=?";
+    public Optional<User> get(Long id) {
+        String sql = "SELECT * FROM users WHERE user_id=?";
         User user = null;
         try (Connection connection = connector.getConnection()) {
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -72,7 +72,7 @@ public class UserDAO implements DAO<User> {
 
     @Override
     public void update(User user) {
-        String updateQuery = "UPDATE users SET (name, surname) VALUES (?,?) "
+        String updateQuery = "UPDATE users SET name=?, surname=? "
                 + "WHERE user_id=?";
         try (Connection connection = connector.getConnection()) {
             PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
@@ -86,11 +86,11 @@ public class UserDAO implements DAO<User> {
     }
 
     @Override
-    public void delete(User user) {
-        String sql = "DELETE FROM users WHERE user_is=?";
+    public void delete(Long id) {
+        String sql = "DELETE FROM users WHERE user_id=?";
         try (Connection connection = connector.getConnection()) {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, user.getId());
+            ps.setLong(1, id);
             ps.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();

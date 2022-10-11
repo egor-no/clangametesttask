@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 //Проверяю чтение Клана и его сохранение
 public class DBTest {
 
-    private static H2Connector сonnector = new H2Connector();
+    private static H2Connector connector = new H2Connector();
 
     @Test
     @DisplayName("Create table in DB")
@@ -25,7 +25,7 @@ public class DBTest {
                 "     name VARCHAR(100) NOT NULL\n" +
                 ")";
 
-        PreparedStatement statement = сonnector.getConnection().prepareStatement(testQuery);
+        PreparedStatement statement = connector.getConnection().prepareStatement(testQuery);
         statement.executeUpdate();
         statement.close();
     }
@@ -37,7 +37,7 @@ public class DBTest {
         String insertQuery = "INSERT INTO test"
                 + " (name) VALUES" + " (?)";
 
-        PreparedStatement insertPreparedStatement = сonnector.getConnection()
+        PreparedStatement insertPreparedStatement = connector.getConnection()
                 .prepareStatement(insertQuery);
         insertPreparedStatement.setString(1, "hello from JUnit");
 
@@ -51,7 +51,7 @@ public class DBTest {
     public void testReadDB() throws SQLException {
         String sql = "SELECT * FROM test WHERE test_id=?";
 
-        PreparedStatement statement = сonnector.getConnection().prepareStatement(sql);
+        PreparedStatement statement = connector.getConnection().prepareStatement(sql);
         statement.setLong(1, 1);
         ResultSet rs = statement.executeQuery();
 
@@ -67,9 +67,9 @@ public class DBTest {
     @DisplayName("Read data from DB")
     @Order(4)
     public void testReadActualDB() throws SQLException {
-        String sql = "SELECT * FROM clan WHERE clan_id=?";
+        String sql = "SELECT * FROM clan WHERE clan_id = ?";
 
-        PreparedStatement statement = сonnector.getConnection().prepareStatement(sql);
+        PreparedStatement statement = connector.getConnection().prepareStatement(sql);
         statement.setLong(1, 1);
         ResultSet rs = statement.executeQuery();
 

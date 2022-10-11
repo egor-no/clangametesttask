@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class TaskTransactionDAO implements DAO<TaskTransaction> {
+public class TaskTransactionDAO implements DAO<TaskTransaction, Long> {
 
     @Inject
     private H2Connector connector;
@@ -21,7 +21,7 @@ public class TaskTransactionDAO implements DAO<TaskTransaction> {
     private TransactionDAO transactionDAO;
 
     @Override
-    public Optional<TaskTransaction> get(long id) {
+    public Optional<TaskTransaction> get(Long id) {
         String sql = "SELECT t.transaction_id, t.clan_id, t.delta, t.source, t.is_successful, tt.task_id \n" +
                 "FROM task_transaction tt LEFT JOIN transaction t ON tt.transaction_id = t.transaction_id \n" +
                 "WHERE transaction_id=?";
@@ -71,8 +71,9 @@ public class TaskTransactionDAO implements DAO<TaskTransaction> {
                 + "(transaction_id, task_id) VALUES (?,?)";
         try (Connection connection = connector.getConnection()) {
             transactionDAO.save(taskTransaction.getTransaction());
+            long transactionId = transactionDAO.getAll().size();
             PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);
-            insertPreparedStatement.setLong(1, taskTransaction.getTransactionId());
+            insertPreparedStatement.setLong(1, transactionId);
             insertPreparedStatement.setLong(2, taskTransaction.getTaskId());
             insertPreparedStatement.executeUpdate();
         } catch (SQLException ex) {
@@ -89,12 +90,12 @@ public class TaskTransactionDAO implements DAO<TaskTransaction> {
     }
 
     @Override
-    public void delete(TaskTransaction taskTransaction) {
-        String sql = "DELETE FROM task_transaction" +
+    public void delete(Long id) {
+        String sql = "DELETE FROM task_transaction " +
                 "WHERE transaction_id=?";
         try (Connection connection = connector.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setLong(1, taskTransaction.getTransactionId());
+            statement.setLong(1, id);
             statement.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();

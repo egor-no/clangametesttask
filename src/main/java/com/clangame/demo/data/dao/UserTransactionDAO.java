@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UserTransactionDAO implements DAO<UserAddGoldTransaction> {
+public class UserTransactionDAO implements DAO<UserAddGoldTransaction, Long> {
 
     @Inject
     private H2Connector connector;
@@ -20,7 +20,7 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction> {
     private TransactionDAO transactionDAO;
 
     @Override
-    public Optional<UserAddGoldTransaction> get(long id) {
+    public Optional<UserAddGoldTransaction> get(Long id) {
         String sql = "SELECT t.transaction_id, t.clan_id, t.delta, t.source, t.is_successful, ut.user_id \n" +
                 "FROM user_transaction ut LEFT JOIN transaction t ON ut.transaction_id = t.transaction_id \n" +
                 "WHERE transaction_id=?";
@@ -70,8 +70,9 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction> {
                 + "(transaction_id, user_id) VALUES (?,?)";
         try (Connection connection = connector.getConnection()) {
             transactionDAO.save(userTransaction.getTransaction());
+            long transactionId = transactionDAO.getAll().size();
             PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);
-            insertPreparedStatement.setLong(1, userTransaction.getTransactionId());
+            insertPreparedStatement.setLong(1, transactionId);
             insertPreparedStatement.setLong(2, userTransaction.getUserId());
             insertPreparedStatement.executeUpdate();
         } catch (SQLException ex) {
@@ -85,12 +86,12 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction> {
     }
 
     @Override
-    public void delete(UserAddGoldTransaction userTransaction) {
+    public void delete(Long id) {
         String sql = "DELETE FROM user_transaction " +
                 "WHERE transaction_id=?";
         try (Connection connection = connector.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setLong(1, userTransaction.getTransactionId());
+            statement.setLong(1, id);
             statement.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();

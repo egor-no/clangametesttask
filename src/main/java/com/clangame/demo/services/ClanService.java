@@ -9,6 +9,8 @@ import java.util.List;
 // Но это сервис, просто все остальные методы не нужны для примера
 public interface ClanService {
     Clan get(long clanId);
+    long save(Clan clan);
+    void update(Clan clan);
+    void delete(long clanId);
     List<Clan> getAll(); //я всё же добавил один метод, хоть он и не нужен для примера
-    void save(Clan clan);
 }

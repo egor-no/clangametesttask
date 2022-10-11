@@ -1,12 +1,17 @@
 package com.clangame.demo.services;
 
+import com.clangame.demo.data.dao.TaskTransactionDAO;
 import com.clangame.demo.data.dao.TransactionDAO;
+import com.clangame.demo.data.dao.UserTransactionDAO;
 import com.clangame.demo.data.entities.Clan;
+import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.data.entities.Transaction;
+import com.clangame.demo.data.entities.UserAddGoldTransaction;
 import com.clangame.demo.data.tools.GoldSource;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.util.List;
 
 @ApplicationScoped
 public class TransactionService {
@@ -15,10 +20,28 @@ public class TransactionService {
     private TransactionDAO transactionDAO;
 
     @Inject
+    private TaskTransactionDAO taskTransactionDAO;
+
+    @Inject
+    private UserTransactionDAO userTransactionDAO;
+
+    @Inject
     private ClanService clanService;
 
     public Transaction get(long transactionId) {
         return transactionDAO.get(transactionId).orElse(null);
+    }
+
+    public TaskTransaction getTaskTransaction(long transactionId) {
+        return taskTransactionDAO.get(transactionId).orElse(null);
+    }
+
+    public UserAddGoldTransaction getUserTransaction(long transactionId) {
+        return userTransactionDAO.get(transactionId).orElse(null);
+    }
+
+    public List<Transaction> getAllByClan(long clanId) {
+        return transactionDAO.getAllByClanId(clanId);
     }
 
     public void save(Transaction transaction) {
@@ -43,8 +66,8 @@ public class TransactionService {
         }
     }
 
-    public void delete(Transaction transaction) {
-        transactionDAO.delete(transaction);
+    public void delete(long transactionId) {
+        transactionDAO.delete(transactionId);
     }
 
 }

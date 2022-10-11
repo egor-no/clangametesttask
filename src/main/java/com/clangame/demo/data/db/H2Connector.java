@@ -12,22 +12,23 @@ public class H2Connector {
 
     private boolean initIsNeeded = true;
 
-    private final String jdbcURL = "jdbc:h2:~/test";
-    private final String jdbcUser = "sa";
-    private final String jdbcPass = "";
+    private static final String driver = "org.h2.Driver";
+    private static final String jdbcURL = "jdbc:h2:~/test";
+    private static final String jdbcUser = "sa";
+    private static final String jdbcPass = "";
+
+    private volatile Connection connection;
 
     @SneakyThrows
     public Connection getConnection() {
-        Class.forName("org.h2.Driver");
-        Connection connection = DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
+        Class.forName(driver);
 
         if (initIsNeeded) {
-            H2dataInitializer.fillTheDB(connection);
+            H2dataInitializer.fillTheDB(DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass));
             initIsNeeded = false;
         }
 
-        return connection;
+        return DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
     }
-
 
 }

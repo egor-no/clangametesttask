@@ -1,5 +1,7 @@
 package com.clangame.demo.data.db;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -10,25 +12,37 @@ import java.sql.SQLException;
 @ApplicationScoped
 public class H2Connector {
 
-    private boolean initIsNeeded = true;
+    private static HikariConfig config = new HikariConfig();
+    private static HikariDataSource dataSource;
 
     private static final String driver = "org.h2.Driver";
     private static final String jdbcURL = "jdbc:h2:~/test";
     private static final String jdbcUser = "sa";
     private static final String jdbcPass = "";
 
-    private volatile Connection connection;
+    static {
+        try {
+            Class.forName(driver);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        config.setJdbcUrl("jdbc:h2:~/test");
+        config.setUsername("sa");
+        config.setPassword("");
+        config.setMaximumPoolSize(100);
+        dataSource = new HikariDataSource(config);
+
+        try {
+            H2dataInitializer.fillTheDB(dataSource.getConnection());
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     @SneakyThrows
-    public Connection getConnection() {
+    public Connection getConnection() throws SQLException {
         Class.forName(driver);
-
-        if (initIsNeeded) {
-            H2dataInitializer.fillTheDB(DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass));
-            initIsNeeded = false;
-        }
-
-        return DriverManager.getConnection(jdbcURL, jdbcUser, jdbcPass);
+        return dataSource.getConnection();
     }
 
 }

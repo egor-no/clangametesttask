@@ -77,7 +77,7 @@ public class TransactionDAO implements DAO<Transaction, Long> {
     }
 
     @Override
-    public void save(Transaction transaction) {
+    public synchronized void save(Transaction transaction) {
         String insertQuery = "INSERT INTO transaction " +
                 "(clan_id, delta, source, is_successful) VALUES " + "(?,?,?,?)";
         try (Connection connection = connector.getConnection()) {

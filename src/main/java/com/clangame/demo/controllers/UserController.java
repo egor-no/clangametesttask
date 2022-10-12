@@ -1,9 +1,6 @@
 package com.clangame.demo.controllers;
 
-import com.clangame.demo.data.entities.Clan;
-import com.clangame.demo.data.entities.TaskTransaction;
-import com.clangame.demo.data.entities.Transaction;
-import com.clangame.demo.data.entities.User;
+import com.clangame.demo.data.entities.*;
 import com.clangame.demo.services.UserAddGoldService;
 import com.clangame.demo.services.UserService;
 
@@ -62,7 +59,7 @@ public class UserController {
     public Response addmoney(@PathParam("id") long id,
                              @QueryParam("clan") long clanId,
                              @QueryParam("gold") int gold) {
-        Transaction transaction = addGoldService.addGoldToClan(id, clanId, gold);
+        UserAddGoldTransaction transaction = addGoldService.addGoldToClan(id, clanId, gold);
         return Response.ok(transaction).build();
     }
 

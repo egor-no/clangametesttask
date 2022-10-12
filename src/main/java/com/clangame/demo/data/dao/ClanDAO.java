@@ -74,7 +74,7 @@ public class ClanDAO implements DAO<Clan, Long> {
     }
 
     @Override
-    public void update(Clan clan) {
+    public synchronized void update(Clan clan) {
         String updateQuery = "UPDATE clan SET name=?, gold=? "
                 + "WHERE clan_id=?";
         try (Connection connection = connector.getConnection()) {

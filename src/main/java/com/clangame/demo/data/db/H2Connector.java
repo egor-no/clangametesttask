@@ -29,7 +29,9 @@ public class H2Connector {
         config.setJdbcUrl("jdbc:h2:~/test");
         config.setUsername("sa");
         config.setPassword("");
-        config.setMaximumPoolSize(100);
+        config.setConnectionTimeout(50000);
+        config.setMaximumPoolSize(102);
+        config.setLeakDetectionThreshold(1000);
         dataSource = new HikariDataSource(config);
 
         try {

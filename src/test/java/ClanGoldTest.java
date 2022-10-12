@@ -1,64 +1,77 @@
-import com.clangame.demo.data.db.H2Connector;
-import com.clangame.demo.data.db.H2dataInitializer;
 import com.clangame.demo.services.ClanService;
 import com.clangame.demo.services.ClanServiceImpl;
-import com.clangame.demo.services.TaskService;
-import com.clangame.demo.services.UserAddGoldService;
-import org.junit.Before;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import testThreads.TaskServiceThread;
 import testThreads.UserAddGoldServiceThread;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.io.IOException;
 import java.util.Random;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 //тесты для проверки основной функции зачисления денег
 public class ClanGoldTest {
 
-    private static H2Connector сonnector = new H2Connector();
-
     @Test
     @DisplayName("TaskService changes gold")
-    public void testOneTaskService() {
-        try (Connection connection = сonnector.getConnection()) {
-            ClanService clanService = new ClanServiceImpl();
-            TaskService taskService = new TaskService();
-            taskService.completeTask(1, 1);
+    public void testOneTaskService() throws IOException {
 
-            assertEquals(100, clanService.get(1).getGold());
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+        Integer oldBalance = extractBalance();
+
+        JSONObject inner = null;
+        do {
+            HttpUriRequest request = new HttpPut("http://localhost:8080/ClanGame-1.0-SNAPSHOT/task/1/complete?clan=1");
+            HttpResponse httpResponse = HttpClientBuilder.create().build().execute(request);
+
+            try {
+                String json_string = null;
+                json_string = EntityUtils.toString(httpResponse.getEntity());
+                JSONObject transaction = new JSONObject(json_string);
+                inner = transaction.getJSONObject("transaction");
+            } catch (org.json.JSONException e) {
+            }
+        } while (inner == null || inner.get("successful").equals("true"));
+
+        Integer newBalance = extractBalance();
+
+        assertEquals(oldBalance+100, newBalance);
     }
 
     @Test
     @DisplayName("UserAddService changes gold")
-    public void testOneUserAddGoldService() {
-         try (Connection connection = сonnector.getConnection()) {
-            ClanService clanService = new ClanServiceImpl();
-            UserAddGoldService userAddGoldService = new UserAddGoldService();
-            userAddGoldService.addGoldToClan(1,1, 100);;
+    public void testOneUserAddGoldService() throws IOException {
+        Integer oldBalance = extractBalance();
 
-            assertEquals(100, clanService.get(1).getGold());
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+        HttpUriRequest request = new HttpPut("http://localhost:8080/ClanGame-1.0-SNAPSHOT/users/1/addmoney?gold=50&clan=1");
+        HttpResponse httpResponse = HttpClientBuilder.create().build().execute(request);
+
+        String json_string = EntityUtils.toString(httpResponse.getEntity());
+        JSONObject transaction = new JSONObject(json_string);
+
+        JSONObject inner = transaction.getJSONObject("transaction");
+        assertEquals(50, inner.get("delta"));
+
+        Integer newBalance = extractBalance();
+
+        assertEquals(oldBalance+50, newBalance);
     }
 
     @Test
     @DisplayName("100 TaskServices change gold")
-    public void testHundredTaskServices() {
-        ClanService clanService = new ClanServiceImpl();
+    public void testHundredTaskServices() throws IOException, InterruptedException {
         final CyclicBarrier gate = new CyclicBarrier(100);
 
         for (int i = 0 ; i < 100; i++) {
-            new TaskServiceThread(clanService, gate).start();
+            new TaskServiceThread(gate).start();
         }
         try {
             gate.await();
@@ -68,19 +81,19 @@ public class ClanGoldTest {
             e.printStackTrace();
         }
 
-        assertEquals(100*100, clanService.get(1).getGold());
+        assertEquals(100*100, extractBalance());
 
     }
 
     @Test
     @DisplayName("100 UserAddServices change gold")
-    public void testHundredUserAddGoldServices() {
-        ClanService clanService = new ClanServiceImpl();
-        final CyclicBarrier gate = new CyclicBarrier(100);
+    public void testHundredUserAddGoldServices() throws IOException, InterruptedException {
+        final CyclicBarrier gate = new CyclicBarrier(101);
 
-        for (int i = 0 ; i < 100; i++) {
-            new UserAddGoldServiceThread(clanService, gate).start();
-        }
+        ExecutorService es = Executors.newCachedThreadPool();
+        for(int i=0; i<100; i++)
+            es.execute( new UserAddGoldServiceThread(gate));
+
         try {
             gate.await();
         } catch (InterruptedException e) {
@@ -88,22 +101,25 @@ public class ClanGoldTest {
         } catch (BrokenBarrierException e) {
             e.printStackTrace();
         }
+        es.shutdown();
 
-        assertEquals(100*100, clanService.get(1).getGold());
+        boolean finished = es.awaitTermination(1, TimeUnit.MINUTES);
+
+        assertEquals(5000, extractBalance());
     }
 
     @Test
     @DisplayName("100 Random Services change gold")
-    public void testHundredRandomServices() {
+    public void testHundredRandomServices() throws IOException {
         ClanService clanService = new ClanServiceImpl();
         final CyclicBarrier gate = new CyclicBarrier(100);
 
         for (int i = 0 ; i < 100; i++) {
             int r = new Random().nextInt(2);
             if (r==1)
-                new TaskServiceThread(clanService, gate).start();
+                new TaskServiceThread(gate).start();
             else
-                new UserAddGoldServiceThread(clanService, gate).start();
+                new UserAddGoldServiceThread(gate).start();
         }
         try {
             gate.await();
@@ -113,8 +129,14 @@ public class ClanGoldTest {
             e.printStackTrace();
         }
 
-        assertEquals(100*100, clanService.get(1).getGold());
+        assertEquals(100*100, extractBalance());
     }
 
-
+    private Integer extractBalance() throws IOException {
+        HttpUriRequest clanRequest = new HttpGet("http://localhost:8080/ClanGame-1.0-SNAPSHOT/clan/1");
+        HttpResponse httpResponse = HttpClientBuilder.create().build().execute(clanRequest);
+        String json_string = EntityUtils.toString(httpResponse.getEntity());
+        JSONObject clan = new JSONObject(json_string);
+        return (Integer) clan.get("gold");
+    }
 }

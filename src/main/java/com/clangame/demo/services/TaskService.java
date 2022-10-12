@@ -43,7 +43,7 @@ public class TaskService { // какой-то сервис с заданиями
         taskDAO.update(task);
     }
 
-    public TaskTransaction completeTask(long clanId, long taskId) {
+    public synchronized TaskTransaction completeTask(long clanId, long taskId) {
         boolean isAttemptSuccessful = isTaskComplete(clanId, taskId);
         int delta = taskDAO.get(taskId).get().getGoldGiven();
 

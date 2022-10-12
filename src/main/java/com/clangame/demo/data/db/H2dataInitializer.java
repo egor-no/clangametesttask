@@ -20,7 +20,6 @@ public class H2dataInitializer {
         fillUserTable();
 
         try {
-            printDB();
             connection.close();
         } catch (SQLException ex) {
             ex.printStackTrace();

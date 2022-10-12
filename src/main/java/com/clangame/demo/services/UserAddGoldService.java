@@ -19,7 +19,7 @@ public class UserAddGoldService { // пользователь добавляет
     @Inject
     private UserTransactionDAO transactionDAO;
 
-    public Transaction addGoldToClan(long userId, long clanId, int gold) {
+    public synchronized UserAddGoldTransaction addGoldToClan(long userId, long clanId, int gold) {
         Clan clan = clanService.get(clanId);
         //if gold > 0
         Transaction transaction = new Transaction();
@@ -36,7 +36,7 @@ public class UserAddGoldService { // пользователь добавляет
         clan.setGold(newBalance);
         clanService.update(clan);
 
-        return transaction;
+        return userTransaction;
     }
 
 

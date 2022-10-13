@@ -25,13 +25,14 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction, Long> {
                 "FROM user_transaction ut LEFT JOIN transaction t ON ut.transaction_id = t.transaction_id \n" +
                 "WHERE transaction_id=?";
         UserAddGoldTransaction userTransaction = null;
-        try (Connection connection = connector.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 userTransaction = extractTransaction(rs);
             }
+            rs.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -43,13 +44,14 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction, Long> {
         String sql = "SELECT t.transaction_id, t.clan_id, t.delta, t.source, t.is_successful, ut.user_id \n" +
                 "FROM user_transaction ut LEFT JOIN transaction t ON ut.transaction_id = t.transaction_id";
         List<UserAddGoldTransaction> transactions = new ArrayList<>();
-        try (Connection connection = connector.getConnection()) {
-            Statement statement = connection.createStatement();
+        try (Connection connection = connector.getConnection();
+             Statement statement = connection.createStatement()) {
             ResultSet rs = statement.executeQuery(sql);
             while (rs.next()) {
                 UserAddGoldTransaction userTransaction = extractTransaction(rs);
                 transactions.add(userTransaction);
             }
+            rs.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -68,10 +70,10 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction, Long> {
     public void save(UserAddGoldTransaction userTransaction) {
         String insertQuery = "INSERT INTO user_transaction "
                 + "(transaction_id, user_id) VALUES (?,?)";
-        try (Connection connection = connector.getConnection()) {
+        try (Connection connection = connector.getConnection();
+             PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery)) {
             transactionDAO.save(userTransaction.getTransaction());
             long transactionId = transactionDAO.getAll().size();
-            PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);
             insertPreparedStatement.setLong(1, transactionId);
             insertPreparedStatement.setLong(2, userTransaction.getUserId());
             insertPreparedStatement.executeUpdate();
@@ -89,8 +91,8 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction, Long> {
     public void delete(Long id) {
         String sql = "DELETE FROM user_transaction " +
                 "WHERE transaction_id=?";
-        try (Connection connection = connector.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.executeUpdate();
         } catch (SQLException ex) {

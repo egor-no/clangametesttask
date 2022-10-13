@@ -24,7 +24,7 @@ public class ClanServiceImpl implements ClanService {
     }
 
     @Override
-    public synchronized long save(Clan clan) {
+    public long save(Clan clan) {
         clanDAO.save(clan);
         long id = clanDAO.getAll().size();
         return id;

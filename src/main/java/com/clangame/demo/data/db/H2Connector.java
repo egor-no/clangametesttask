@@ -30,7 +30,7 @@ public class H2Connector {
         config.setUsername("sa");
         config.setPassword("");
         config.setConnectionTimeout(50000);
-        config.setMaximumPoolSize(102);
+        config.setMaximumPoolSize(100);
         config.setLeakDetectionThreshold(1000);
         dataSource = new HikariDataSource(config);
 

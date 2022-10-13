@@ -68,31 +68,12 @@ public class ClanGoldTest {
     @Test
     @DisplayName("100 TaskServices change gold")
     public void testHundredTaskServices() throws IOException, InterruptedException {
-        final CyclicBarrier gate = new CyclicBarrier(100);
-
-        for (int i = 0 ; i < 100; i++) {
-            new TaskServiceThread(gate).start();
-        }
-        try {
-            gate.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
-        }
-
-        assertEquals(100*100, extractBalance());
-
-    }
-
-    @Test
-    @DisplayName("100 UserAddServices change gold")
-    public void testHundredUserAddGoldServices() throws IOException, InterruptedException {
         final CyclicBarrier gate = new CyclicBarrier(101);
+        int oldBalance = extractBalance();
 
         ExecutorService es = Executors.newCachedThreadPool();
         for(int i=0; i<100; i++)
-            es.execute( new UserAddGoldServiceThread(gate));
+            es.execute( new TaskServiceThread(gate));
 
         try {
             gate.await();
@@ -102,24 +83,54 @@ public class ClanGoldTest {
             e.printStackTrace();
         }
         es.shutdown();
-
         boolean finished = es.awaitTermination(1, TimeUnit.MINUTES);
 
-        assertEquals(5000, extractBalance());
+        assertEquals(oldBalance + 100*100, extractBalance());
+
+    }
+
+    @Test
+    @DisplayName("100 UserAddServices change gold")
+    public void testHundredUserAddGoldServices() throws IOException, InterruptedException {
+        final CyclicBarrier gate = new CyclicBarrier(101);
+        int oldBalance = extractBalance();
+
+        ExecutorService es = Executors.newCachedThreadPool();
+        for(int i=0; i<100; i++)
+            es.execute( new UserAddGoldServiceThread(gate));
+        try {
+            gate.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }
+        es.shutdown();
+        boolean finished = es.awaitTermination(1, TimeUnit.MINUTES);
+
+        assertEquals(oldBalance + 100*50, extractBalance());
     }
 
     @Test
     @DisplayName("100 Random Services change gold")
-    public void testHundredRandomServices() throws IOException {
-        ClanService clanService = new ClanServiceImpl();
-        final CyclicBarrier gate = new CyclicBarrier(100);
+    public void testHundredRandomServices() throws IOException, InterruptedException {
+        final CyclicBarrier gate = new CyclicBarrier(101);
+        int oldBalance = extractBalance();
+        int countTaskThreads = 0;
+        int countUserthreads = 0;
 
+        ExecutorService es = Executors.newCachedThreadPool();
         for (int i = 0 ; i < 100; i++) {
+            Thread thread;
             int r = new Random().nextInt(2);
-            if (r==1)
-                new TaskServiceThread(gate).start();
-            else
-                new UserAddGoldServiceThread(gate).start();
+            if (r==1) {
+                thread = new TaskServiceThread(gate);
+                countTaskThreads++;
+            } else {
+                thread = new UserAddGoldServiceThread(gate);
+                countUserthreads++;
+            }
+            es.execute(thread);
         }
         try {
             gate.await();
@@ -128,8 +139,10 @@ public class ClanGoldTest {
         } catch (BrokenBarrierException e) {
             e.printStackTrace();
         }
-
-        assertEquals(100*100, extractBalance());
+        es.shutdown();
+        boolean finished = es.awaitTermination(1, TimeUnit.MINUTES);
+        System.out.println(oldBalance+ " " + countUserthreads+ " "+ countTaskThreads);
+        assertEquals(oldBalance + countUserthreads*50 + countTaskThreads*100, extractBalance());
     }
 
     private Integer extractBalance() throws IOException {

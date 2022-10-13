@@ -26,13 +26,14 @@ public class TaskTransactionDAO implements DAO<TaskTransaction, Long> {
                 "FROM task_transaction tt LEFT JOIN transaction t ON tt.transaction_id = t.transaction_id \n" +
                 "WHERE transaction_id=?";
         TaskTransaction taskTransaction = null;
-        try (Connection connection = connector.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 taskTransaction = extractTransaction(rs);
             }
+            rs.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -44,9 +45,9 @@ public class TaskTransactionDAO implements DAO<TaskTransaction, Long> {
         String sql = "SELECT t.transaction_id, t.clan_id, t.delta, t.source, t.is_successful, tt.task_id \n" +
                 "FROM task_transaction tt LEFT JOIN transaction t ON tt.transaction_id = t.transaction_id";
         List<TaskTransaction> transactions = new ArrayList<>();
-        try (Connection connection = connector.getConnection()) {
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(sql);
+        try (Connection connection = connector.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
                 TaskTransaction taskTransaction = extractTransaction(rs);
                 transactions.add(taskTransaction);
@@ -76,6 +77,7 @@ public class TaskTransactionDAO implements DAO<TaskTransaction, Long> {
             insertPreparedStatement.setLong(1, transactionId);
             insertPreparedStatement.setLong(2, taskTransaction.getTaskId());
             insertPreparedStatement.executeUpdate();
+            insertPreparedStatement.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -93,8 +95,8 @@ public class TaskTransactionDAO implements DAO<TaskTransaction, Long> {
     public void delete(Long id) {
         String sql = "DELETE FROM task_transaction " +
                 "WHERE transaction_id=?";
-        try (Connection connection = connector.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.executeUpdate();
         } catch (SQLException ex) {

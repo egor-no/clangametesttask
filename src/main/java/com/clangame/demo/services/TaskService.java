@@ -43,7 +43,7 @@ public class TaskService { // какой-то сервис с заданиями
         taskDAO.update(task);
     }
 
-    public synchronized TaskTransaction completeTask(long clanId, long taskId) {
+    public TaskTransaction completeTask(long clanId, long taskId) {
         boolean isAttemptSuccessful = isTaskComplete(clanId, taskId);
         int delta = taskDAO.get(taskId).get().getGoldGiven();
 
@@ -70,10 +70,10 @@ public class TaskService { // какой-то сервис с заданиями
     private boolean isTaskComplete(long clanId, long taskId) {
         //имитируем логику задания
         //у нас логики нет. всё решает рандом
-        int random = new Random().nextInt(100);
-        if (random<60)
+   //     int random = new Random().nextInt(100);
+    //    if (random<60)
             return true;
-        return false;
+    //    return false;
     }
 
     public void delete(long taskId) {

@@ -21,13 +21,14 @@ public class TransactionDAO implements DAO<Transaction, Long> {
     public Optional<Transaction> get(Long id) {
         String sql = "SELECT * FROM transaction WHERE transaction_id=?";
         Transaction transaction = null;
-        try (Connection connection = connector.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 transaction = extractTransaction(rs);
             }
+            rs.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -38,8 +39,8 @@ public class TransactionDAO implements DAO<Transaction, Long> {
     public List<Transaction> getAll() {
         String sql = "SELECT * FROM transaction";
         List<Transaction> transactions = new ArrayList<>();
-        try (Connection connection = connector.getConnection()) {
-            Statement statement = connection.createStatement();
+        try (Connection connection = connector.getConnection();
+             Statement statement = connection.createStatement()) {
             ResultSet rs = statement.executeQuery(sql);
             while (rs.next()) {
                 transactions.add(extractTransaction(rs));
@@ -53,13 +54,14 @@ public class TransactionDAO implements DAO<Transaction, Long> {
     public List<Transaction> getAllByClanId(long clanId) {
         String sql = "SELECT * FROM transaction WHERE clan_id=?";
         List<Transaction> transactions = new ArrayList<>();
-        try (Connection connection = connector.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, clanId);
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 transactions.add(extractTransaction(rs));
             }
+            rs.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -80,8 +82,8 @@ public class TransactionDAO implements DAO<Transaction, Long> {
     public synchronized void save(Transaction transaction) {
         String insertQuery = "INSERT INTO transaction " +
                 "(clan_id, delta, source, is_successful) VALUES " + "(?,?,?,?)";
-        try (Connection connection = connector.getConnection()) {
-            PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery)) {
             insertPreparedStatement.setLong(1, transaction.getClanId());
             insertPreparedStatement.setInt(2, transaction.getDelta());
             insertPreparedStatement.setString(3, transaction.getSource().name());
@@ -97,8 +99,8 @@ public class TransactionDAO implements DAO<Transaction, Long> {
         String updateQuery = "UPDATE transaction " +
                 "SET clan_id=?, delta=?, source=?, is_successful=? " +
                 "WHERE transaction_id=?";
-        try (Connection connection = connector.getConnection()) {
-            PreparedStatement insertPreparedStatement = connection.prepareStatement(updateQuery);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement insertPreparedStatement = connection.prepareStatement(updateQuery)) {
             insertPreparedStatement.setLong(1, transaction.getClanId());
             insertPreparedStatement.setInt(2, transaction.getDelta());
             insertPreparedStatement.setString(3, transaction.getSource().name());
@@ -113,8 +115,8 @@ public class TransactionDAO implements DAO<Transaction, Long> {
     @Override
     public void delete(Long id) {
         String sql = "DELETE FROM transaction WHERE transaction_id=?";
-        try (Connection connection = connector.getConnection()){
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)){
             ps.setLong(1, id);
             ps.executeUpdate();
         } catch (SQLException ex) {

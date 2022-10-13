@@ -21,9 +21,8 @@ public class ClanDAO implements DAO<Clan, Long> {
         String sql = "SELECT * FROM clan WHERE clan_id=?";
 
         Clan clan = null;
-        try (Connection connection = connector.getConnection()){
-            System.out.println(connection.isClosed() + " ");
-            PreparedStatement ps = connector.getConnection().prepareStatement(sql);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -32,6 +31,7 @@ public class ClanDAO implements DAO<Clan, Long> {
                 clan.setName(rs.getString("name"));
                 clan.setGold(rs.getInt("gold"));
             }
+            rs.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -43,9 +43,9 @@ public class ClanDAO implements DAO<Clan, Long> {
     public List<Clan> getAll() {
         String sql = "SELECT * FROM clan";
         List<Clan> clans = new ArrayList<>();
-        try (Connection connection = connector.getConnection()){ ;
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(sql);
+        try (Connection connection = connector.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
                 Clan clan = new Clan();
                 clan.setId(rs.getLong("clan_id"));
@@ -63,8 +63,8 @@ public class ClanDAO implements DAO<Clan, Long> {
     @Override
     public void save(Clan clan) {
         String insertQuery = "INSERT INTO clan " + "(name, gold) VALUES " + "(?,?)";
-        try (Connection connection = connector.getConnection()) {
-            PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);) {
             insertPreparedStatement.setString(1, clan.getName());
             insertPreparedStatement.setInt(2, clan.getGold());
             insertPreparedStatement.executeUpdate();
@@ -77,8 +77,8 @@ public class ClanDAO implements DAO<Clan, Long> {
     public synchronized void update(Clan clan) {
         String updateQuery = "UPDATE clan SET name=?, gold=? "
                 + "WHERE clan_id=?";
-        try (Connection connection = connector.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(updateQuery);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(updateQuery)) {
             statement.setString(1, clan.getName());
             statement.setInt(2, clan.getGold());
             System.out.println("!!!!!!!!!!!!!!!!! " + clan.getGold() + " !!!!!!!!!!");
@@ -92,8 +92,8 @@ public class ClanDAO implements DAO<Clan, Long> {
     @Override
     public void delete(Long id) {
         String sql = "DELETE FROM clan WHERE clan_id=?";
-        try (Connection connection = connector.getConnection()){
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = connector.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)){
             ps.setLong(1, id);
             ps.executeUpdate();
 

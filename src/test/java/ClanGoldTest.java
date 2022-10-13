@@ -1,5 +1,3 @@
-import com.clangame.demo.services.ClanService;
-import com.clangame.demo.services.ClanServiceImpl;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
@@ -33,8 +31,7 @@ public class ClanGoldTest {
             HttpResponse httpResponse = HttpClientBuilder.create().build().execute(request);
 
             try {
-                String json_string = null;
-                json_string = EntityUtils.toString(httpResponse.getEntity());
+                String json_string = EntityUtils.toString(httpResponse.getEntity());
                 JSONObject transaction = new JSONObject(json_string);
                 inner = transaction.getJSONObject("transaction");
             } catch (org.json.JSONException e) {
@@ -77,13 +74,11 @@ public class ClanGoldTest {
 
         try {
             gate.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
+        } catch (InterruptedException | BrokenBarrierException e) {
             e.printStackTrace();
         }
         es.shutdown();
-        boolean finished = es.awaitTermination(1, TimeUnit.MINUTES);
+        es.awaitTermination(1, TimeUnit.MINUTES);
 
         assertEquals(oldBalance + 100*100, extractBalance());
 
@@ -100,13 +95,11 @@ public class ClanGoldTest {
             es.execute( new UserAddGoldServiceThread(gate));
         try {
             gate.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
+        } catch (InterruptedException | BrokenBarrierException e) {
             e.printStackTrace();
         }
         es.shutdown();
-        boolean finished = es.awaitTermination(1, TimeUnit.MINUTES);
+        es.awaitTermination(1, TimeUnit.MINUTES);
 
         assertEquals(oldBalance + 100*50, extractBalance());
     }
@@ -134,13 +127,11 @@ public class ClanGoldTest {
         }
         try {
             gate.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
+        } catch (InterruptedException | BrokenBarrierException e) {
             e.printStackTrace();
         }
         es.shutdown();
-        boolean finished = es.awaitTermination(1, TimeUnit.MINUTES);
+        es.awaitTermination(1, TimeUnit.MINUTES);
         System.out.println(oldBalance+ " " + countUserthreads+ " "+ countTaskThreads);
         assertEquals(oldBalance + countUserthreads*50 + countTaskThreads*100, extractBalance());
     }

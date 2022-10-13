@@ -2,7 +2,6 @@ package com.clangame.demo.data.dao;
 
 import com.clangame.demo.data.db.H2Connector;
 import com.clangame.demo.data.entities.Clan;
-import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.data.entities.Transaction;
 import com.clangame.demo.data.entities.UserAddGoldTransaction;
 import com.clangame.demo.exception.TransactionIsNotCommittedException;

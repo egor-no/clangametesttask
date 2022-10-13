@@ -1,6 +1,5 @@
 package com.clangame.demo.controllers;
 
-import com.clangame.demo.data.entities.Clan;
 import com.clangame.demo.data.entities.Task;
 import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.exception.TransactionIsNotCommittedException;
@@ -16,9 +15,6 @@ public class TaskController {
 
     @Inject
     TaskService taskService;
-
-    @Inject
-    TransactionService transactionService;
 
     @GET
     @Path("/{id}")

@@ -4,10 +4,8 @@ import com.clangame.demo.data.db.H2Connector;
 import com.clangame.demo.data.entities.Clan;
 import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.data.entities.Transaction;
-import com.clangame.demo.data.tools.GoldSource;
 import com.clangame.demo.exception.TransactionIsNotCommittedException;
 import lombok.SneakyThrows;
-import org.h2.command.Prepared;
 
 import javax.inject.Inject;
 import java.sql.*;

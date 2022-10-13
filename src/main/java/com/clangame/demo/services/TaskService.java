@@ -2,7 +2,6 @@ package com.clangame.demo.services;
 
 import com.clangame.demo.data.dao.TaskDAO;
 import com.clangame.demo.data.dao.TaskTransactionDAO;
-import com.clangame.demo.data.entities.Clan;
 import com.clangame.demo.data.entities.Task;
 import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.data.entities.Transaction;

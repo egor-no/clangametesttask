@@ -1,7 +1,6 @@
 package com.clangame.demo.data.dao;
 
 import com.clangame.demo.data.db.H2Connector;
-import com.clangame.demo.data.entities.Clan;
 import com.clangame.demo.data.entities.User;
 
 import javax.inject.Inject;
@@ -43,7 +42,7 @@ public class UserDAO implements DAO<User, Long> {
         List<User> users = new ArrayList<>();
         try (Connection connection = connector.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet rs = statement.executeQuery(sql)){
+             ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
                 User user = new User();
                 user.setId(rs.getLong("user_id"));

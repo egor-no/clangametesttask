@@ -1,21 +1,13 @@
 package testThreads;
 
-import com.clangame.demo.services.ClanService;
-import com.clangame.demo.services.UserAddGoldService;
 import lombok.SneakyThrows;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.hamcrest.MatcherAssert;
-import org.json.JSONObject;
 
 import java.util.concurrent.CyclicBarrier;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserAddGoldServiceThread extends Thread  {
 

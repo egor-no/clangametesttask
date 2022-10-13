@@ -1,7 +1,5 @@
 package testThreads;
 
-import com.clangame.demo.services.ClanService;
-import com.clangame.demo.services.TaskService;
 import lombok.SneakyThrows;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -12,8 +10,6 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import java.util.concurrent.CyclicBarrier;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TaskServiceThread extends Thread {
 

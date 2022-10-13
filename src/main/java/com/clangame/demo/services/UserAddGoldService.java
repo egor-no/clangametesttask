@@ -1,8 +1,6 @@
 package com.clangame.demo.services;
 
 import com.clangame.demo.data.dao.UserTransactionDAO;
-import com.clangame.demo.data.entities.Clan;
-import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.data.entities.Transaction;
 import com.clangame.demo.data.entities.UserAddGoldTransaction;
 import com.clangame.demo.data.tools.GoldSource;
@@ -17,8 +15,9 @@ public class UserAddGoldService { // пользователь добавляет
     @Inject
     private UserTransactionDAO transactionDAO;
 
-    public synchronized UserAddGoldTransaction addGoldToClan(long userId, long clanId, int gold) throws TransactionIsNotCommittedException {
-        //if gold > 0
+    public synchronized UserAddGoldTransaction addGoldToClan(long userId,
+                                                             long clanId,
+                                                             int gold) throws TransactionIsNotCommittedException {
         Transaction transaction = new Transaction();
         transaction.setSuccessful(true);
         transaction.setSource(GoldSource.USER_ADD);
@@ -28,10 +27,6 @@ public class UserAddGoldService { // пользователь добавляет
         userTransaction.setTransaction(transaction);
         userTransaction.setUserId(userId);
         transactionDAO.saveAndEditRelatedClanDAO(userTransaction);
-
-//        int newBalance = clan.getGold() + gold;
-//        clan.setGold(newBalance);
-//        clanService.update(clan);
         return userTransaction;
     }
 

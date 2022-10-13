@@ -7,7 +7,6 @@ import com.clangame.demo.data.entities.Clan;
 import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.data.entities.Transaction;
 import com.clangame.demo.data.entities.UserAddGoldTransaction;
-import com.clangame.demo.data.tools.GoldSource;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

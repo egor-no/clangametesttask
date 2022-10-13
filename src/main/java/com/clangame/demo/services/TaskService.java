@@ -10,6 +10,7 @@ import com.clangame.demo.exception.TransactionIsNotCommittedException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -48,6 +49,7 @@ public class TaskService { // какой-то сервис с заданиями
         int delta = taskDAO.get(taskId).get().getGoldGiven();
 
         Transaction transaction = new Transaction();
+        transaction.setDate(LocalDateTime.now());
         transaction.setSuccessful(isAttemptSuccessful);
         transaction.setSource(GoldSource.TASK);
         transaction.setClanId(clanId);

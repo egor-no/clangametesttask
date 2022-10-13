@@ -8,6 +8,7 @@ import com.clangame.demo.exception.TransactionIsNotCommittedException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.time.LocalDateTime;
 
 @ApplicationScoped
 public class UserAddGoldService { // пользователь добавляет золото из собственного кармана
@@ -23,6 +24,7 @@ public class UserAddGoldService { // пользователь добавляет
         transaction.setSource(GoldSource.USER_ADD);
         transaction.setClanId(clanId);
         transaction.setDelta(gold);
+        transaction.setDate(LocalDateTime.now());
         UserAddGoldTransaction userTransaction = new UserAddGoldTransaction();
         userTransaction.setTransaction(transaction);
         userTransaction.setUserId(userId);

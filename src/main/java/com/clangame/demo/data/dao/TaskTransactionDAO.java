@@ -1,9 +1,11 @@
 package com.clangame.demo.data.dao;
 
 import com.clangame.demo.data.db.H2Connector;
+import com.clangame.demo.data.entities.Clan;
 import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.data.entities.Transaction;
 import com.clangame.demo.data.tools.GoldSource;
+import lombok.SneakyThrows;
 import org.h2.command.Prepared;
 
 import javax.inject.Inject;
@@ -19,6 +21,9 @@ public class TaskTransactionDAO implements DAO<TaskTransaction, Long> {
 
     @Inject
     private TransactionDAO transactionDAO;
+
+    @Inject
+    private ClanDAO clanDAO;
 
     @Override
     public Optional<TaskTransaction> get(Long id) {
@@ -81,6 +86,42 @@ public class TaskTransactionDAO implements DAO<TaskTransaction, Long> {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    @SneakyThrows
+    public synchronized boolean saveAndEditRelatedClan(TaskTransaction taskTransaction) {
+        String insertQuery = "INSERT INTO task_transaction "
+                + "(transaction_id, task_id) VALUES (?,?)";
+        Connection connection = null;
+        boolean committed = false;
+        try {
+            connection = connector.getConnection();
+            connection.setAutoCommit(false);
+            transactionDAO.save(taskTransaction.getTransaction());
+            long transactionId = transactionDAO.getAll().size();
+            PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);
+            insertPreparedStatement.setLong(1, transactionId);
+            insertPreparedStatement.setLong(2, taskTransaction.getTaskId());
+            insertPreparedStatement.executeUpdate();
+            insertPreparedStatement.close();
+
+            Clan clan = clanDAO.get(taskTransaction.getClanId(), connection).get();
+            int oldBalance = clan.getGold();
+            clan.setGold(oldBalance + taskTransaction.getTransaction().getDelta());
+            clanDAO.update(clan, connection);
+            connection.commit();
+            committed = true;
+        } catch (SQLException ex) {
+            try {
+                System.err.print("Transaction is being rolled back");
+                connection.rollback();
+            } catch (SQLException innerEx) {
+                innerEx.printStackTrace();
+            }
+        } finally {
+            connection.close();
+        }
+        return committed;
     }
 
     @Override

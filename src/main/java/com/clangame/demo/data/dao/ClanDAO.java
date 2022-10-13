@@ -18,23 +18,32 @@ public class ClanDAO implements DAO<Clan, Long> {
 
     @Override
     public Optional<Clan> get(Long id) {
-        String sql = "SELECT * FROM clan WHERE clan_id=?";
+        Optional<Clan> clan = Optional.empty();
 
-        Clan clan = null;
-        try (Connection connection = connector.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setLong(1, id);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                clan = new Clan();
-                clan.setId(rs.getLong("clan_id"));
-                clan.setName(rs.getString("name"));
-                clan.setGold(rs.getInt("gold"));
-            }
-            rs.close();
+        try (Connection connection = connector.getConnection()) {
+            clan = get(id, connection);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+
+        return clan;
+    }
+
+    public Optional<Clan> get(Long id, Connection connection) throws SQLException {
+        String sql = "SELECT * FROM clan WHERE clan_id=?";
+
+        Clan clan = null;
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ps.setLong(1, id);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            clan = new Clan();
+            clan.setId(rs.getLong("clan_id"));
+            clan.setName(rs.getString("name"));
+            clan.setGold(rs.getInt("gold"));
+        }
+        rs.close();
+        ps.close();
 
         return Optional.ofNullable(clan);
     }
@@ -61,7 +70,7 @@ public class ClanDAO implements DAO<Clan, Long> {
     }
 
     @Override
-    public void save(Clan clan) {
+    public synchronized void save(Clan clan) {
         String insertQuery = "INSERT INTO clan " + "(name, gold) VALUES " + "(?,?)";
         try (Connection connection = connector.getConnection();
              PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);) {
@@ -77,16 +86,24 @@ public class ClanDAO implements DAO<Clan, Long> {
     public synchronized void update(Clan clan) {
         String updateQuery = "UPDATE clan SET name=?, gold=? "
                 + "WHERE clan_id=?";
-        try (Connection connection = connector.getConnection();
-             PreparedStatement statement = connection.prepareStatement(updateQuery)) {
-            statement.setString(1, clan.getName());
-            statement.setInt(2, clan.getGold());
-            System.out.println("!!!!!!!!!!!!!!!!! " + clan.getGold() + " !!!!!!!!!!");
-            statement.setLong(3, clan.getId());
-            statement.executeUpdate();
+        try (Connection connection = connector.getConnection()) {
+            update(clan, connection);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public synchronized void update(Clan clan, Connection connection) throws SQLException {
+        String updateQuery = "UPDATE clan SET name=?, gold=? "
+                + "WHERE clan_id=?";
+
+        PreparedStatement statement = connection.prepareStatement(updateQuery);
+        statement.setString(1, clan.getName());
+        statement.setInt(2, clan.getGold());
+        System.out.println("!!!!!!!!!!!!!!!!! " + clan.getGold() + " !!!!!!!!!!");
+        statement.setLong(3, clan.getId());
+        statement.executeUpdate();
+        statement.close();
     }
 
     @Override

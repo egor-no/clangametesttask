@@ -3,9 +3,9 @@ package com.clangame.demo.data.dao;
 import java.util.List;
 import java.util.Optional;
 
-public interface DAO<T, Long> {
+public interface DAO<T, K> {
 
-    Optional<T> get(Long id);
+    Optional<T> get(K id);
 
     List<T> getAll();
 
@@ -13,5 +13,5 @@ public interface DAO<T, Long> {
 
     void update(T t);
 
-    void delete(Long id);
+    void delete(K id);
 }

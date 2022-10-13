@@ -44,7 +44,9 @@ public class H2Connector {
     @SneakyThrows
     public Connection getConnection() throws SQLException {
         Class.forName(driver);
-        return dataSource.getConnection();
+        Connection connection = dataSource.getConnection();
+        connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+        return connection;
     }
 
 }

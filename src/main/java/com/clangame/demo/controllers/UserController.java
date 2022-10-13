@@ -60,7 +60,11 @@ public class UserController {
                              @QueryParam("clan") long clanId,
                              @QueryParam("gold") int gold) {
         UserAddGoldTransaction transaction = addGoldService.addGoldToClan(id, clanId, gold);
-        return Response.ok(transaction).build();
+        if (transaction != null) {
+            return Response.ok(transaction).build();
+        } else {
+            return Response.serverError().build();
+        }
     }
 
     @DELETE

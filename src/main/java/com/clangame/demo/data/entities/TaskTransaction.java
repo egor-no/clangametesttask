@@ -13,4 +13,7 @@ public class TaskTransaction {
         return transaction.getId();
     }
 
+    public long getClanId() {
+        return transaction.getClanId();
+    }
 }

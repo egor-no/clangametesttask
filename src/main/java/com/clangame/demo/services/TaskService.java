@@ -55,25 +55,26 @@ public class TaskService { // какой-то сервис с заданиями
         TaskTransaction taskTransaction = new TaskTransaction();
         taskTransaction.setTransaction(transaction);
         taskTransaction.setTaskId(taskId);
-        transactionDAO.save(taskTransaction);
-        if (isAttemptSuccessful) {
-            Clan clan = clanService.get(clanId);
-            int newBalance = clan.getGold() + delta;
-            clan.setGold(newBalance);
-            clanService.update(clan);
-            return taskTransaction;
-        } else
-            return null;
 
+        if (isAttemptSuccessful) {
+            boolean isCommitted = transactionDAO.saveAndEditRelatedClan(taskTransaction);
+            if (isCommitted)
+                return taskTransaction;
+            else
+                return null;
+        } else {
+            transactionDAO.save(taskTransaction);
+            return null;
+        }
     }
 
     private boolean isTaskComplete(long clanId, long taskId) {
         //имитируем логику задания
         //у нас логики нет. всё решает рандом
-   //     int random = new Random().nextInt(100);
-    //    if (random<60)
+        int random = new Random().nextInt(100);
+        if (random<60)
             return true;
-    //    return false;
+        return false;
     }
 
     public void delete(long taskId) {

@@ -12,4 +12,8 @@ public class UserAddGoldTransaction {
     public long getTransactionId() {
         return transaction.getId();
     }
+
+    public long getClanId() {
+        return transaction.getClanId();
+    }
 }

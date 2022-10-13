@@ -1,9 +1,11 @@
 package com.clangame.demo.data.dao;
 
 import com.clangame.demo.data.db.H2Connector;
+import com.clangame.demo.data.entities.Clan;
 import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.data.entities.Transaction;
 import com.clangame.demo.data.entities.UserAddGoldTransaction;
+import lombok.SneakyThrows;
 
 import javax.inject.Inject;
 import java.sql.*;
@@ -18,6 +20,9 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction, Long> {
 
     @Inject
     private TransactionDAO transactionDAO;
+
+    @Inject
+    private ClanDAO clanDAO;
 
     @Override
     public Optional<UserAddGoldTransaction> get(Long id) {
@@ -71,15 +76,55 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction, Long> {
         String insertQuery = "INSERT INTO user_transaction "
                 + "(transaction_id, user_id) VALUES (?,?)";
         try (Connection connection = connector.getConnection();
-             PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery)) {
+             PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);) {
             transactionDAO.save(userTransaction.getTransaction());
             long transactionId = transactionDAO.getAll().size();
             insertPreparedStatement.setLong(1, transactionId);
             insertPreparedStatement.setLong(2, userTransaction.getUserId());
             insertPreparedStatement.executeUpdate();
+
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    // оба действия = одна транзакция.
+    // так как это необходимо для поддержания целостности информации в базе,
+    // делаю это на уровне взаимодействия с базой, а не в сервисе
+    @SneakyThrows
+    public synchronized boolean saveAndEditRelatedClanDAO(UserAddGoldTransaction userTransaction) {
+        String insertQuery = "INSERT INTO user_transaction "
+                + "(transaction_id, user_id) VALUES (?,?)";
+        Connection connection = null;
+        boolean committed = false;
+        try {
+            connection = connector.getConnection();
+            connection.setAutoCommit(false);
+            PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);
+            transactionDAO.save(userTransaction.getTransaction());
+            long transactionId = transactionDAO.getAll().size();
+            insertPreparedStatement.setLong(1, transactionId);
+            insertPreparedStatement.setLong(2, userTransaction.getUserId());
+            insertPreparedStatement.executeUpdate();
+            insertPreparedStatement.close();
+
+            Clan clan = clanDAO.get(userTransaction.getClanId(), connection).get();
+            int oldBalance = clan.getGold();
+            clan.setGold(oldBalance+userTransaction.getTransaction().getDelta());
+            clanDAO.update(clan, connection);
+            connection.commit();
+            committed = true;
+        } catch (SQLException ex) {
+            try {
+                System.err.print("Transaction is being rolled back");
+                connection.rollback();
+            } catch (SQLException innerEx) {
+                innerEx.printStackTrace();
+            }
+        } finally {
+            connection.close();
+        }
+        return committed;
     }
 
     @Override

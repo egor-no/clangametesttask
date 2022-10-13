@@ -14,13 +14,9 @@ import javax.inject.Inject;
 public class UserAddGoldService { // пользователь добавляет золото из собственного кармана
 
     @Inject
-    private ClanService clanService;
-
-    @Inject
     private UserTransactionDAO transactionDAO;
 
     public synchronized UserAddGoldTransaction addGoldToClan(long userId, long clanId, int gold) {
-        Clan clan = clanService.get(clanId);
         //if gold > 0
         Transaction transaction = new Transaction();
         transaction.setSuccessful(true);
@@ -30,16 +26,17 @@ public class UserAddGoldService { // пользователь добавляет
         UserAddGoldTransaction userTransaction = new UserAddGoldTransaction();
         userTransaction.setTransaction(transaction);
         userTransaction.setUserId(userId);
-        transactionDAO.save(userTransaction);
+        boolean success = transactionDAO.saveAndEditRelatedClanDAO(userTransaction);
 
-        int newBalance = clan.getGold() + gold;
-        clan.setGold(newBalance);
-        clanService.update(clan);
-
-        return userTransaction;
+//        int newBalance = clan.getGold() + gold;
+//        clan.setGold(newBalance);
+//        clanService.update(clan);
+        if (success)
+            return userTransaction;
+        else
+            return null;
+          //  throw new RollbackTransactionException();
     }
-
-
 
 
 }

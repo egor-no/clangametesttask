@@ -35,6 +35,8 @@ public class TaskServiceThread extends Thread {
             try {
                 String json_string = null;
                 json_string = EntityUtils.toString(httpResponse.getEntity());
+                System.out.println(json_string);
+
                 JSONObject transaction = new JSONObject(json_string);
                 inner = transaction.getJSONObject("transaction");
             } catch (org.json.JSONException e) {

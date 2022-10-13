@@ -5,6 +5,7 @@ import com.clangame.demo.data.entities.Clan;
 import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.data.entities.Transaction;
 import com.clangame.demo.data.tools.GoldSource;
+import com.clangame.demo.exception.TransactionIsNotCommittedException;
 import lombok.SneakyThrows;
 import org.h2.command.Prepared;
 
@@ -89,7 +90,7 @@ public class TaskTransactionDAO implements DAO<TaskTransaction, Long> {
     }
 
     @SneakyThrows
-    public synchronized boolean saveAndEditRelatedClan(TaskTransaction taskTransaction) {
+    public synchronized void saveAndEditRelatedClan(TaskTransaction taskTransaction) throws TransactionIsNotCommittedException {
         String insertQuery = "INSERT INTO task_transaction "
                 + "(transaction_id, task_id) VALUES (?,?)";
         Connection connection = null;
@@ -112,16 +113,13 @@ public class TaskTransactionDAO implements DAO<TaskTransaction, Long> {
             connection.commit();
             committed = true;
         } catch (SQLException ex) {
-            try {
-                System.err.print("Transaction is being rolled back");
-                connection.rollback();
-            } catch (SQLException innerEx) {
-                innerEx.printStackTrace();
-            }
+            System.err.print("Transaction is being rolled back");
+            connection.rollback();
         } finally {
             connection.close();
         }
-        return committed;
+        if (!committed)
+            throw new TransactionIsNotCommittedException();
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.clangame.demo.controllers;
 import com.clangame.demo.data.entities.Clan;
 import com.clangame.demo.data.entities.Task;
 import com.clangame.demo.data.entities.TaskTransaction;
+import com.clangame.demo.exception.TransactionIsNotCommittedException;
 import com.clangame.demo.services.TaskService;
 import com.clangame.demo.services.TransactionService;
 
@@ -54,12 +55,13 @@ public class TaskController {
     @Path("/{id}/complete")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response complete(@PathParam("id") long id, @QueryParam("clan") long clanId) {
-        TaskTransaction transaction = taskService.completeTask(clanId, id);
-        if (transaction != null) {
+        try {
+            TaskTransaction transaction = taskService.completeTask(clanId, id);
             return Response.ok(transaction).build();
-        } else {
-            return Response.ok("The task wasn't completed. Good luck next time").build();
+        } catch (TransactionIsNotCommittedException e) {
+            return Response.status(503, "База данных не может обработать запрос. Попробуйте ещё раз").build();
         }
+
     }
 
     @DELETE

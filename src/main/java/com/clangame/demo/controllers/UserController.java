@@ -1,6 +1,7 @@
 package com.clangame.demo.controllers;
 
 import com.clangame.demo.data.entities.*;
+import com.clangame.demo.exception.TransactionIsNotCommittedException;
 import com.clangame.demo.services.UserAddGoldService;
 import com.clangame.demo.services.UserService;
 
@@ -59,11 +60,11 @@ public class UserController {
     public Response addmoney(@PathParam("id") long id,
                              @QueryParam("clan") long clanId,
                              @QueryParam("gold") int gold) {
-        UserAddGoldTransaction transaction = addGoldService.addGoldToClan(id, clanId, gold);
-        if (transaction != null) {
+        try {
+            UserAddGoldTransaction transaction = addGoldService.addGoldToClan(id, clanId, gold);
             return Response.ok(transaction).build();
-        } else {
-            return Response.serverError().build();
+        } catch (TransactionIsNotCommittedException e) {
+            return Response.status(503, "База данных не может обработать запрос. Попробуйте ещё раз").build();
         }
     }
 

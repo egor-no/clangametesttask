@@ -7,6 +7,7 @@ import com.clangame.demo.data.entities.Task;
 import com.clangame.demo.data.entities.TaskTransaction;
 import com.clangame.demo.data.entities.Transaction;
 import com.clangame.demo.data.tools.GoldSource;
+import com.clangame.demo.exception.TransactionIsNotCommittedException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -43,7 +44,7 @@ public class TaskService { // какой-то сервис с заданиями
         taskDAO.update(task);
     }
 
-    public TaskTransaction completeTask(long clanId, long taskId) {
+    public TaskTransaction completeTask(long clanId, long taskId) throws TransactionIsNotCommittedException {
         boolean isAttemptSuccessful = isTaskComplete(clanId, taskId);
         int delta = taskDAO.get(taskId).get().getGoldGiven();
 
@@ -57,11 +58,8 @@ public class TaskService { // какой-то сервис с заданиями
         taskTransaction.setTaskId(taskId);
 
         if (isAttemptSuccessful) {
-            boolean isCommitted = transactionDAO.saveAndEditRelatedClan(taskTransaction);
-            if (isCommitted)
-                return taskTransaction;
-            else
-                return null;
+            transactionDAO.saveAndEditRelatedClan(taskTransaction);
+            return taskTransaction;
         } else {
             transactionDAO.save(taskTransaction);
             return null;
@@ -72,7 +70,7 @@ public class TaskService { // какой-то сервис с заданиями
         //имитируем логику задания
         //у нас логики нет. всё решает рандом
         int random = new Random().nextInt(100);
-        if (random<60)
+        if (random<99)
             return true;
         return false;
     }

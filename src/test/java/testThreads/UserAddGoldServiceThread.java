@@ -34,7 +34,6 @@ public class UserAddGoldServiceThread extends Thread  {
         do {
             HttpUriRequest request = new HttpPut("http://localhost:8080/ClanGame-1.0-SNAPSHOT/users/1/addmoney?gold=50&clan=1");
             httpResponse = HttpClientBuilder.create().build().execute(request);
-
-        } while (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        } while (httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK);
     }
 }

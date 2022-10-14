@@ -77,7 +77,7 @@ public class TransactionDAO implements DAO<Transaction, Long> {
     }
 
     @Override
-    public synchronized void save(Transaction transaction) {
+    public void save(Transaction transaction) {
         try (Connection connection = connector.getConnection()) {
             save(transaction, connection);
         } catch (SQLException ex) {

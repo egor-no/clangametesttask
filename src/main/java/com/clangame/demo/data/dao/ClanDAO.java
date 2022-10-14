@@ -93,7 +93,7 @@ public class ClanDAO implements DAO<Clan, Long> {
         }
     }
 
-    public synchronized void update(Clan clan, Connection connection) throws SQLException {
+    public void update(Clan clan, Connection connection) throws SQLException {
         String updateQuery = "UPDATE clan SET name=?, gold=? "
                 + "WHERE clan_id=?";
 

@@ -88,7 +88,7 @@ public class TaskTransactionDAO implements DAO<TaskTransaction, Long> {
     }
 
     @SneakyThrows
-    public synchronized void saveAndEditRelatedClan(TaskTransaction taskTransaction) throws TransactionIsNotCommittedException {
+    public void saveAndEditRelatedClan(TaskTransaction taskTransaction) throws TransactionIsNotCommittedException {
         String insertQuery = "INSERT INTO task_transaction "
                 + "(transaction_id, task_id) VALUES (?,?)";
         Connection connection = null;

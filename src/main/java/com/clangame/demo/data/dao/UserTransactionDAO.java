@@ -92,7 +92,7 @@ public class UserTransactionDAO implements DAO<UserAddGoldTransaction, Long> {
     // так как это необходимо для поддержания целостности информации в базе,
     // делаю это на уровне взаимодействия с базой, а не в сервисе
     @SneakyThrows
-    public synchronized void saveAndEditRelatedClanDAO(UserAddGoldTransaction userTransaction) throws TransactionIsNotCommittedException {
+    public void saveAndEditRelatedClanDAO(UserAddGoldTransaction userTransaction) throws TransactionIsNotCommittedException {
         String insertQuery = "INSERT INTO user_transaction "
                 + "(transaction_id, user_id) VALUES (?,?)";
         Connection connection = null;

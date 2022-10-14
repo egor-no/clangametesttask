@@ -10,6 +10,7 @@ import com.clangame.demo.data.entities.UserAddGoldTransaction;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class TransactionService {
     }
 
     public void save(Transaction transaction) {
-        transaction.setDate(LocalDateTime.now());
+        transaction.setTimestamp(new Timestamp(System.currentTimeMillis()));
         transactionDAO.save(transaction);
         Clan clan = clanService.get(transaction.getClanId());
         int newBalance = clan.getGold() + transaction.getDelta();

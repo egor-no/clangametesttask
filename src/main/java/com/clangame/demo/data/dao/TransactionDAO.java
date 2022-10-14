@@ -78,8 +78,6 @@ public class TransactionDAO implements DAO<Transaction, Long> {
 
     @Override
     public synchronized void save(Transaction transaction) {
-        String insertQuery = "INSERT INTO transaction " +
-                "(clan_id, delta, source, is_successful) VALUES " + "(?,?,?,?)";
         try (Connection connection = connector.getConnection()) {
             save(transaction, connection);
         } catch (SQLException ex) {
@@ -89,13 +87,14 @@ public class TransactionDAO implements DAO<Transaction, Long> {
 
     public void save(Transaction transaction, Connection connection) throws SQLException {
         String insertQuery = "INSERT INTO transaction " +
-                "(clan_id, delta, source, is_successful) VALUES " + "(?,?,?,?)";
+                "(clan_id, delta, source, is_successful, time_stamp) VALUES " + "(?,?,?,?,?)";
 
         PreparedStatement insertPreparedStatement = connection.prepareStatement(insertQuery);
         insertPreparedStatement.setLong(1, transaction.getClanId());
         insertPreparedStatement.setInt(2, transaction.getDelta());
         insertPreparedStatement.setString(3, transaction.getSource().name());
         insertPreparedStatement.setBoolean(4, transaction.isSuccessful());
+        insertPreparedStatement.setTimestamp(5, transaction.getTimestamp());
         insertPreparedStatement.executeUpdate();
         insertPreparedStatement.close();
     }

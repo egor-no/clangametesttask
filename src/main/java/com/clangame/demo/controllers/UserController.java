@@ -1,6 +1,7 @@
 package com.clangame.demo.controllers;
 
 import com.clangame.demo.data.entities.*;
+import com.clangame.demo.exception.IncorrectDataFormatException;
 import com.clangame.demo.exception.TransactionIsNotCommittedException;
 import com.clangame.demo.services.UserAddGoldService;
 import com.clangame.demo.services.UserService;
@@ -65,6 +66,8 @@ public class UserController {
             return Response.ok(transaction).build();
         } catch (TransactionIsNotCommittedException e) {
             return Response.status(503, "База данных не может обработать запрос. Попробуйте ещё раз").build();
+        } catch (IncorrectDataFormatException e) {
+            return Response.status(400, e.getMessage()).build();
         }
     }
 

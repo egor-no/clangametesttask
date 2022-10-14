@@ -69,7 +69,8 @@ public class H2dataInitializer {
                 "     transaction_id BIGINT AUTO_INCREMENT PRIMARY KEY,\n" +
                 "     clan_id BIGINT NOT NULL,\n" +
                 "     delta INT NOT NULL,\n" +
-                "     source VARCHAR(8),\n" +
+                "     source VARCHAR(8),\n " +
+                "     time_stamp TIMESTAMP, \n" +
                 "     is_successful BOOLEAN\n" +
                 ")";
         executeCreateStatement(createQuery);
